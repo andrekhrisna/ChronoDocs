@@ -3233,7 +3233,8 @@
             initLockScreenState();
         });
     </script>
-<!-- PATCH FINAL: RESPONSIVE HP + AUTO-PULL OTOMATIS (KOMPATIBEL 100% DENGAN FILE 178 KB) -->
+
+<!-- PATCH FINAL V3: DIRECT REALTIME CLOUD SYNC (AUTO-PUSH & AUTO-PULL) + MOBILE BAR -->
 <style>
   @media (max-width: 768px) {
     header > div:first-child {
@@ -3245,7 +3246,7 @@
       flex-shrink: 0 !important;
     }
     body {
-      padding-bottom: 70px !important;
+      padding-bottom: 72px !important;
     }
   }
 </style>
@@ -3271,88 +3272,196 @@
 
 <script>
   (function() {
-    let lastAutoPullTime = 0;
+    let pushTimer = null;
+    let isSyncingNow = false;
+    let lastKnownCipher = '';
 
-    // 1. Pastikan opsi Auto-Sync ke Cloud selalu aktif otomatis
-    function forceEnableAutoCloud() {
+    // Ambil konfigurasi Token & Gist ID dari localStorage
+    function readCloudCfg() {
       try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (k && k.includes('sync')) {
-            const cfg = JSON.parse(localStorage.getItem(k) || '{}');
-            if (cfg.token && cfg.gistId && !cfg.autoCloud) {
-              cfg.autoCloud = true;
-              localStorage.setItem(k, JSON.stringify(cfg));
-            }
+        const raw = localStorage.getItem('chronodocs_v2_sync_config');
+        if (!raw) return null;
+        const cfg = JSON.parse(raw);
+        if (cfg && cfg.token && cfg.gistId) {
+          // Pastikan autoCloud selalu aktif otomatis
+          if (!cfg.autoCloud) {
+            cfg.autoCloud = true;
+            localStorage.setItem('chronodocs_v2_sync_config', JSON.stringify(cfg));
           }
+          return cfg;
         }
       } catch (_) {}
+      return null;
     }
 
-    // 2. Fungsi yang menekan tombol "Tarik dari Cloud" secara otomatis untuk Anda
-    async function triggerNativeCloudPull() {
-      const now = Date.now();
-      if (now - lastAutoPullTime < 4000) return; // Jeda aman 4 detik agar tidak terpanggil beruntun
-
+    function isVaultUnlocked() {
       const lockEl = document.getElementById('lockScreen');
-      if (!lockEl || !lockEl.classList.contains('hidden')) return; // Jangan tarik jika layar PIN masih terkunci
+      return lockEl && lockEl.classList.contains('hidden');
+    }
 
-      forceEnableAutoCloud();
+    function updateStatusUI(msg, dotColor) {
+      const dot = document.getElementById('syncDot');
+      const txt = document.getElementById('syncStatusText');
+      if (dot) dot.className = 'w-1.5 h-1.5 rounded-full ' + dotColor;
+      if (txt) txt.textContent = msg;
+    }
+
+    function nowTimeStr() {
+      const d = new Date();
+      return String(d.getHours()).padStart(2, '0') + ':' +
+             String(d.getMinutes()).padStart(2, '0') + ':' +
+             String(d.getSeconds()).padStart(2, '0');
+    }
+
+    // 1. DIRECT AUTO-PUSH: Langsung kirim data terenkripsi lokal ke GitHub Gist
+    async function directPushToCloud() {
+      if (!isVaultUnlocked() || isSyncingNow) return;
+      const cfg = readCloudCfg();
+      if (!cfg) return;
+
+      const localCipher = localStorage.getItem('chronodocs_v2_encrypted_vault');
+      if (!localCipher || localCipher === lastKnownCipher) return;
+
+      isSyncingNow = true;
+      updateStatusUI('Mengirim ke Cloud...', 'bg-amber-500');
 
       try {
-        // Isi dulu nilai Token & Gist ID ke dalam form modal (karena pullFromCloudGist membaca dari input tersebut)
-        if (typeof getSyncConfig === 'function') {
-          const cfg = getSyncConfig();
-          if (!cfg || !cfg.token || !cfg.gistId) return;
+        const res = await fetch('https://api.github.com/gists/' + cfg.gistId, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': 'token ' + cfg.token,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            files: {
+              'vault.chronodoc': { content: localCipher }
+            }
+          })
+        });
 
+        if (res.ok) {
+          lastKnownCipher = localCipher;
+          updateStatusUI('☁️ Terkirim ke Cloud (' + nowTimeStr() + ')', 'bg-emerald-500');
+        } else {
+          updateStatusUI('Gagal kirim Cloud (' + res.status + ')', 'bg-rose-500');
+        }
+      } catch (e) {
+        updateStatusUI('Offline / Gagal kirim Cloud', 'bg-rose-500');
+      } finally {
+        isSyncingNow = false;
+      }
+    }
+
+    // 2. DIRECT AUTO-PULL: Tarik dari GitHub Gist & perbarui layar jika Cloud lebih baru
+    async function directPullFromCloud(silent = true) {
+      if (!isVaultUnlocked() || isSyncingNow) return;
+      // Jangan timpa layar jika pengguna sedang aktif mengetik dalam 3 detik terakhir
+      if (pushTimer !== null) return;
+
+      const cfg = readCloudCfg();
+      if (!cfg) return;
+
+      isSyncingNow = true;
+      if (!silent) updateStatusUI('Mengecek Cloud...', 'bg-indigo-500');
+
+      try {
+        // Gunakan header If-None-Match kosong atau fetch segar tanpa melanggar CORS GitHub
+        const res = await fetch('https://api.github.com/gists/' + cfg.gistId, {
+          method: 'GET',
+          headers: {
+            'Authorization': 'token ' + cfg.token,
+            'Accept': 'application/vnd.github+json'
+          }
+        });
+
+        if (!res.ok) throw new Error('Status ' + res.status);
+        const data = await res.json();
+        const fileObj = data.files['vault.chronodoc'] || Object.values(data.files)[0];
+        if (!fileObj || !fileObj.content) return;
+
+        const cloudCipherStr = fileObj.content;
+        const localCipherStr = localStorage.getItem('chronodocs_v2_encrypted_vault');
+
+        // Bandingkan timestamp amplop enkripsi (ts) antara Cloud vs Perangkat Ini
+        let cloudTs = 0;
+        let localTs = 0;
+        try { cloudTs = JSON.parse(cloudCipherStr).ts || 0; } catch (_) {}
+        try { localTs = localCipherStr ? (JSON.parse(localCipherStr).ts || 0) : 0; } catch (_) {}
+
+        // Jika data di Cloud lebih baru (atau belum sama), langsung isi form & jalankan dekripsi asli
+        if (cloudTs > localTs && cloudCipherStr !== localCipherStr) {
+          lastKnownCipher = cloudCipherStr;
+
+          // Pastikan input Token & Gist ID terisi sebelum memanggil fungsi dekripsi asli
           const tInput = document.getElementById('gistTokenInput') || document.getElementById('syncTokenInput');
           const gInput = document.getElementById('gistIdInput') || document.getElementById('syncGistIdInput');
           const aInput = document.getElementById('autoCloudSyncToggle');
-
           if (tInput) tInput.value = cfg.token;
           if (gInput) gInput.value = cfg.gistId;
           if (aInput) aInput.checked = true;
-        }
 
-        // Panggil langsung fungsi Tarik dari Cloud asli milik file 178 KB Anda!
-        if (typeof pullFromCloudGist === 'function') {
-          lastAutoPullTime = now;
-          await pullFromCloudGist();
-        } else {
-          // Cadangan jika nama fungsinya berbeda: langsung klik tombol "Tarik dari Cloud" secara virtual
-          const pullBtn = document.querySelector('button[onclick*="pullFromCloud"]');
-          if (pullBtn) {
-            lastAutoPullTime = now;
-            pullBtn.click();
+          if (typeof pullFromCloudGist === 'function') {
+            await pullFromCloudGist();
           }
+          updateStatusUI('☁️ Sinkron dari Cloud (' + nowTimeStr() + ')', 'bg-emerald-500');
+        } else {
+          lastKnownCipher = localCipherStr || cloudCipherStr;
+          updateStatusUI('☁️ Cloud Sinkron (' + nowTimeStr() + ')', 'bg-emerald-500');
         }
       } catch (e) {
-        console.warn('Auto-pull gagal:', e);
+        console.warn('Auto-Pull dilewati:', e.message);
+      } finally {
+        isSyncingNow = false;
       }
     }
 
-    // 3. Pantau layar kunci PIN: Begitu layar PIN tertutup (terbuka kuncinya), langsung tarik dari Cloud!
-    window.addEventListener('DOMContentLoaded', () => {
-      forceEnableAutoCloud();
-      const lockEl = document.getElementById('lockScreen');
-      if (lockEl) {
-        const observer = new MutationObserver(() => {
-          if (lockEl.classList.contains('hidden')) {
-            setTimeout(triggerNativeCloudPull, 400);
-          }
-        });
-        observer.observe(lockEl, { attributes: true, attributeFilter: ['class'] });
+    // 3. Pantau setiap ketikan di editor: otomatis kirim ke Cloud 1.5 detik setelah berhenti mengetik
+    document.addEventListener('input', (e) => {
+      if (!isVaultUnlocked()) return;
+      if (e.target && (e.target.isContentEditable || e.target.closest('[contenteditable="true"]'))) {
+        updateStatusUI('Mengetik... (Auto-Sync siap)', 'bg-amber-500');
+        clearTimeout(pushTimer);
+        pushTimer = setTimeout(() => {
+          pushTimer = null;
+          directPushToCloud();
+        }, 1500);
+      }
+    }, true);
+
+    // Pantau juga klik tombol (+ Lembar Baru, Lipat, Pin, Hapus) agar langsung di-push ke Cloud
+    document.addEventListener('click', (e) => {
+      if (!isVaultUnlocked()) return;
+      const btn = e.target.closest('button');
+      if (btn && !btn.closest('#lockScreen') && !btn.closest('#syncModal')) {
+        setTimeout(() => {
+          if (!pushTimer) directPushToCloud();
+        }, 900);
       }
     });
 
-    // 4. Tarik otomatis juga saat Anda berpindah kembali ke tab/aplikasi ChronoDocs
-    window.addEventListener('focus', () => {
-      setTimeout(triggerNativeCloudPull, 300);
-    });
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        setTimeout(triggerNativeCloudPull, 300);
+    // 4. Saat PIN 6 Angka baru saja dibuka -> langsung tarik data terbaru dari Cloud!
+    window.addEventListener('DOMContentLoaded', () => {
+      const lockEl = document.getElementById('lockScreen');
+      if (lockEl) {
+        const obs = new MutationObserver(() => {
+          if (lockEl.classList.contains('hidden')) {
+            setTimeout(() => directPullFromCloud(false), 300);
+          }
+        });
+        obs.observe(lockEl, { attributes: true, attributeFilter: ['class'] });
       }
+
+      // Polling ringan setiap 15 detik agar layar HP/PC yang sedang terbuka ikut ter-update otomatis
+      setInterval(() => {
+        directPullFromCloud(true);
+      }, 15000);
+    });
+
+    // 5. Tarik otomatis saat berpindah aplikasi / membuka kembali layar HP
+    window.addEventListener('focus', () => directPullFromCloud(false));
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') directPullFromCloud(false);
     });
   })();
 </script>
