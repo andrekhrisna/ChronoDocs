@@ -232,6 +232,8 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.65); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* Single Sheet & Full Print Styles */
         #singleSheetPrintArea { display: none; }
@@ -255,7 +257,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col overflow-x-hidden">
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col overflow-x-hidden pb-16 md:pb-0">
 
     <!-- ===================================================================== -->
     <!-- 1. GLOBAL 6-DIGIT PIN LOCK & VAULT SETUP OVERLAY (AES-256-GCM)        -->
@@ -331,10 +333,10 @@
     <!-- 2. TOP HEADER & RICH TEXT FORMATTING TOOLBAR (STICKY)                 -->
     <!-- ===================================================================== -->
     <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 no-print">
-        <div class="max-w-[1800px] mx-auto px-3 sm:px-5 h-14 flex items-center justify-between gap-2">
+        <div class="max-w-[1800px] mx-auto px-3 sm:px-5 h-14 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
             
             <!-- Left: Sidebar Toggle, Brand & Sync Status -->
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0">
                 <button id="btnToggleLeftSidebar" title="Buka/Tutup Daftar Topik" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer">
                     <i data-lucide="panel-left" class="w-5 h-5"></i>
                 </button>
@@ -348,23 +350,23 @@
                             <span class="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white">ChronoDocs</span>
                             <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-300">v2.0 PRO</span>
                         </div>
-                        <div class="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-                            <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span id="syncText" class="truncate max-w-[140px] sm:max-w-[240px]">Vault Terenkripsi Aktif</span>
+                        <div id="btnQuickSyncCheck" class="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 cursor-pointer hover:text-brand-600 transition" title="Klik untuk sinkronisasi instan dengan Cloud sekarang">
+                            <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                            <span id="syncText" class="truncate max-w-[145px] sm:max-w-[260px]">Vault Terenkripsi Aktif</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Center: Instant Search with Scope Toggle (Current Topic vs All Topics) -->
-            <div class="flex-1 max-w-lg mx-1 sm:mx-3">
+            <div class="flex-1 max-w-lg mx-1 sm:mx-3 min-w-[140px]">
                 <div class="relative flex items-center">
                     <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none"></i>
                     <input
                         id="searchInput"
                         type="text"
                         placeholder="Cari teks, #tag, atau tanggal... (Ctrl+F)"
-                        class="w-full pl-9 pr-28 py-1.5 text-xs sm:text-sm rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 transition"
+                        class="w-full pl-9 pr-24 py-1.5 text-xs sm:text-sm rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 transition"
                     />
                     <div class="absolute right-1.5 flex items-center gap-1">
                         <button
@@ -383,7 +385,7 @@
             </div>
 
             <!-- Right: + Lembar Baru, Cloud Sync, Security/PIN, Panic Lock, Zen Mode & Theme -->
-            <div class="flex items-center gap-1 sm:gap-1.5">
+            <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <!-- Primary Action: New Sheet at Top -->
                 <button
                     id="btnNewSheetTop"
@@ -455,7 +457,7 @@
         </div>
 
         <!-- RICH TEXT EDITOR FORMATTING TOOLBAR -->
-        <div class="bg-slate-50/95 dark:bg-slate-900/95 border-t border-slate-200/80 dark:border-slate-800 px-2 sm:px-5 py-1.5 overflow-x-auto">
+        <div class="bg-slate-50/95 dark:bg-slate-900/95 border-t border-slate-200/80 dark:border-slate-800 px-2 sm:px-5 py-1.5 overflow-x-auto no-scrollbar">
             <div class="max-w-[1800px] mx-auto flex items-center gap-1 min-w-max">
                 <!-- Undo / Redo -->
                 <button type="button" data-cmd="undo" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer" title="Urungkan (Ctrl+Z)">
@@ -749,6 +751,32 @@
 
     </div>
 
+    <!-- ===================================================================== -->
+    <!-- MOBILE BOTTOM BAR (BUILT-IN NATIVELY FOR PHONES & TABLETS)            -->
+    <!-- ===================================================================== -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 flex items-center justify-around shadow-2xl no-print">
+        <button type="button" id="btnMobileTopics" class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl text-slate-600 dark:text-slate-300 text-[10px] font-semibold cursor-pointer">
+            <i data-lucide="folder-kanban" class="w-4 h-4"></i>
+            <span>Topik</span>
+        </button>
+        <button type="button" id="btnMobileSync" class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl text-brand-600 dark:text-brand-400 text-[10px] font-bold cursor-pointer">
+            <i data-lucide="cloud-cog" class="w-4 h-4"></i>
+            <span>Sync</span>
+        </button>
+        <button type="button" id="btnMobileNewSheet" class="flex items-center gap-1 px-3.5 py-2 rounded-2xl bg-brand-600 active:scale-95 text-white text-xs font-bold shadow-md cursor-pointer">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Lembar Baru</span>
+        </button>
+        <button type="button" id="btnMobileTimeline" class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl text-slate-600 dark:text-slate-300 text-[10px] font-semibold cursor-pointer">
+            <i data-lucide="git-commit-vertical" class="w-4 h-4"></i>
+            <span>Timeline</span>
+        </button>
+        <button type="button" id="btnMobileLock" class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl text-rose-600 dark:text-rose-400 text-[10px] font-bold cursor-pointer">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+            <span>Kunci</span>
+        </button>
+    </nav>
+
     <!-- DEDICATED SINGLE-SHEET PRINT AREA (Only visible during Single Sheet Print) -->
     <div id="singleSheetPrintArea"></div>
 
@@ -764,7 +792,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-base text-slate-900 dark:text-white">Sinkronisasi Zero-Knowledge Cloud & Perangkat</h3>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Data dienkripsi AES-256 dengan PIN 6 angka sebelum meninggalkan perangkat Anda</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Auto-Push saat mengetik & Auto-Read otomatis setiap 6 detik</p>
                     </div>
                 </div>
                 <button id="btnCloseCloudModal" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
@@ -776,17 +804,17 @@
             <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 space-y-3 mb-4">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-                        <i data-lucide="Lock" class="w-3.5 h-3.5 text-emerald-500"></i>
+                        <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-500"></i>
                         Jalur 1: Zero-Knowledge Cloud Relay (GitHub Secret Gist)
                     </span>
                     <label class="inline-flex items-center gap-1.5 text-xs cursor-pointer">
-                        <input type="checkbox" id="chkAutoCloudSync" class="rounded accent-brand-600" />
-                        <span class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Auto-Sync saat mengedit</span>
+                        <input type="checkbox" id="chkAutoCloudSync" checked class="rounded accent-brand-600" />
+                        <span class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Auto-Sync 2 Arah Aktif</span>
                     </label>
                 </div>
 
                 <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                    Gunakan <strong>GitHub Personal Access Token</strong> (cukup centang izin <code class="font-mono bg-slate-200 dark:bg-slate-700 px-1 rounded">gist</code>). Isi catatan Anda disimpan sebagai <em>ciphertext</em> terenkripsi di Gist rahasia pribadi Anda.
+                    Gunakan <strong>GitHub Personal Access Token</strong> (cukup centang izin <code class="font-mono bg-slate-200 dark:bg-slate-700 px-1 rounded">gist</code>). Token disimpan permanen di perangkat ini dan menyinkronkan catatan secara otomatis.
                 </p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1066,13 +1094,13 @@
     </div>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toastNotification" class="fixed bottom-4 right-4 z-[90] hidden items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-xl no-print">
+    <div id="toastNotification" class="fixed bottom-16 md:bottom-4 right-4 z-[95] hidden items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-xl no-print">
         <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 dark:text-emerald-600"></i>
         <span id="toastText">Tersimpan</span>
     </div>
 
     <!-- ===================================================================== -->
-    <!-- 10. APPLICATION ENGINE: WEB CRYPTO AES-256, CLOUD GIST & MULTI-TOPIC  -->
+    <!-- 10. APPLICATION ENGINE: WEB CRYPTO AES-256 & NATIVE TWO-WAY AUTO-SYNC -->
     <!-- ===================================================================== -->
     <script>
         // ====================================================================
@@ -1100,40 +1128,44 @@
         const TOPIC_ICONS = ['📘', '🏫', '💼', '🚀', '💡', '📊', '🧪', '🏠', '💰', '📝', '🎯', '🔒'];
 
         // ====================================================================
-        // B. RUNTIME STATE (Sensitive data cleared immediately on Lock)
+        // B. RUNTIME STATE & NATIVE TWO-WAY SYNC STATE
         // ====================================================================
-        let currentSessionPin = null; // Held only in RAM while unlocked
+        let currentSessionPin = null;
         let isVaultLocked = true;
-        let pinSetupStage = 'unlock'; // 'create' | 'confirm' | 'unlock'
+        let pinSetupStage = 'unlock';
         let pinBuffer = '';
         let firstPinEntered = '';
 
         let vaultData = {
             version: 2,
-            updatedAt: Date.now(),
+            updatedAt: 0,
             activeTopicId: null,
             topics: []
         };
 
         let activeSheetId = null;
         let savedSelectionRange = null;
-        let sortDirection = 'newest'; // 'newest' | 'oldest'
-        let searchScope = 'topic';    // 'topic' | 'all'
+        let sortDirection = 'newest';
+        let searchScope = 'topic';
         let activeSearchQuery = '';
         let activeTagFilter = null;
         let editingTopicId = null;
         let selectedTopicIcon = '📘';
         let pendingDeleteAction = null;
 
-        // Auto-lock & Panic state
         let autoLockMinutes = 5;
         let lastActivityTime = Date.now();
         let lastEscapePressTime = 0;
 
-        // File System Access API Handle & Cloud Debounce
+        // Native Cloud & Local Sync Engine State
         let localFileHandle = null;
         let saveVaultDebounceTimer = null;
-        let cloudSyncDebounceTimer = null;
+        let cloudPushDebounceTimer = null;
+        let isCloudSyncInFlight = false;
+        let isLocalDirty = false;
+        let lastLocalEditTime = 0;
+        let lastKnownCloudCiphertext = '';
+
         const broadcastChannel = ('BroadcastChannel' in window) ? new BroadcastChannel('chronodocs_v2_sync') : null;
 
         // ====================================================================
@@ -1169,7 +1201,7 @@
                                 content: `
                                     <h1 class="doc-title">Evaluasi Mingguan &amp; Agenda Rumah Belajar</h1>
                                     <h2 class="doc-subtitle">Lembar terbaru selalu berada di Halaman 1 (Paling Atas) — langsung terlihat begitu dibuka!</h2>
-                                    <blockquote class="doc-description">Deskripsi: Selamat datang di <b>ChronoDocs v2.0 Pro</b>. Seluruh topik dan lembar catatan Anda kini dikunci menggunakan enkripsi militer <b>AES-GCM 256-bit (PIN 6 Angka)</b> dan siap disinkronkan antar PC Rumah, Rumah Belajar, Tablet, dan HP.</blockquote>
+                                    <blockquote class="doc-description">Deskripsi: Selamat datang di <b>ChronoDocs v2.0 Pro</b>. Seluruh topik dan lembar catatan Anda kini dikunci menggunakan enkripsi militer <b>AES-GCM 256-bit (PIN 6 Angka)</b> dan siap disinkronkan otomatis antar PC Rumah, Rumah Belajar, Tablet, dan HP.</blockquote>
                                     <h1>1. Keunggulan Alur Kronologis Terbalik</h1>
                                     <p>Catatan yang paling baru adalah yang <span style="background-color: #fef08a;">paling relevan dan sering diakses</span>. Setiap kali Anda menekan tombol <b>"+ Lembar Baru"</b> (atau <code style="font-family: monospace;">Alt + N</code>), lembar kosong muncul di atas ini, dan catatan lama otomatis turun menjadi Halaman 2, 3, dst.</p>
                                     <h2>Checklist Operasional Hari Ini</h2>
@@ -1311,12 +1343,17 @@
         }
 
         async function decryptVaultPayload(envelope, pin) {
-            if (!envelope || !envelope.salt || !envelope.iv || !envelope.ciphertext) {
+            // Support both envelope formats (ciphertext/ct) seamlessly
+            const saltB64 = envelope?.salt;
+            const ivB64   = envelope?.iv;
+            const ctB64   = envelope?.ciphertext || envelope?.ct;
+
+            if (!saltB64 || !ivB64 || !ctB64) {
                 throw new Error('Format vault terenkripsi tidak valid');
             }
-            const salt = new Uint8Array(base64ToBuf(envelope.salt));
-            const iv   = new Uint8Array(base64ToBuf(envelope.iv));
-            const cipherBuf = base64ToBuf(envelope.ciphertext);
+            const salt = new Uint8Array(base64ToBuf(saltB64));
+            const iv   = new Uint8Array(base64ToBuf(ivB64));
+            const cipherBuf = base64ToBuf(ctB64);
 
             const key = await deriveKeyFromPin(pin, salt);
             const plainBuffer = await window.crypto.subtle.decrypt(
@@ -1326,7 +1363,12 @@
             );
 
             const dec = new TextDecoder();
-            return JSON.parse(dec.decode(plainBuffer));
+            const parsed = JSON.parse(dec.decode(plainBuffer));
+            const envTime = envelope.updatedAt || envelope.ts || 0;
+            if (envTime && (!parsed.updatedAt || envTime > parsed.updatedAt)) {
+                parsed.updatedAt = envTime;
+            }
+            return parsed;
         }
 
         // ====================================================================
@@ -1398,11 +1440,10 @@
                     errEl.textContent = 'PIN tidak cocok. Silakan buat ulang PIN 6 angka Anda.';
                     return;
                 }
-                // Initialize brand-new encrypted vault
                 currentSessionPin = enteredPin;
                 vaultData = createDefaultVaultData();
                 await saveAndEncryptVault({ triggerCloud: false });
-                unlockWorkspaceUI();
+                await unlockWorkspaceUI();
                 showToast('Vault AES-256 berhasil dibuat & diamankan!');
                 return;
             }
@@ -1414,7 +1455,8 @@
                     const decrypted = await decryptVaultPayload(envelope, enteredPin);
                     currentSessionPin = enteredPin;
                     vaultData = decrypted;
-                    unlockWorkspaceUI();
+                    lastKnownCloudCiphertext = envelope.ciphertext || '';
+                    await unlockWorkspaceUI();
                 } catch (e) {
                     pinBuffer = '';
                     updatePinDotsUI();
@@ -1423,13 +1465,12 @@
             }
         }
 
-        function unlockWorkspaceUI() {
+        async function unlockWorkspaceUI() {
             isVaultLocked = false;
             pinBuffer = '';
             updatePinDotsUI();
             document.getElementById('pinLockOverlay').classList.add('hidden');
 
-            // Ensure valid activeTopicId and activeSheetId
             if (!vaultData.topics || vaultData.topics.length === 0) {
                 vaultData = createDefaultVaultData();
             }
@@ -1438,8 +1479,15 @@
                 activeSheetId = getSortedSheetsForTopic(activeTopic)[0].id;
             }
             lastActivityTime = Date.now();
+            populateCloudModalFields();
             renderAll();
             updateCiphertextInspector();
+
+            // NATIVE AUTO-READ ON UNLOCK: Immediately check Cloud Gist upon unlocking PIN
+            const cfg = loadCloudConfig();
+            if (cfg.token && cfg.gistId) {
+                await autoCheckAndPullFromCloud({ isInitialUnlock: true });
+            }
         }
 
         function lockVaultImmediately(reason = 'Vault dikunci') {
@@ -1448,7 +1496,6 @@
             currentSessionPin = null;
             pinBuffer = '';
 
-            // Wipe sensitive decrypted DOM immediately
             document.getElementById('sheetsContainer').innerHTML = '';
             document.getElementById('topicsListContainer').innerHTML = '';
             document.getElementById('timelineJumperList').innerHTML = '';
@@ -1458,26 +1505,26 @@
         }
 
         // ====================================================================
-        // F. SAVE & ENCRYPT VAULT (LocalStorage + File Handle + Cloud Gist)
+        // F. SAVE & ENCRYPT VAULT + NATIVE TWO-WAY CLOUD ENGINE
         // ====================================================================
         async function saveAndEncryptVault(options = { triggerCloud: true }) {
             if (!currentSessionPin || isVaultLocked) return;
 
             setSyncStatus('syncing', 'Mengenkripsi & menyimpan...');
-            vaultData.updatedAt = Date.now();
+            const now = Date.now();
+            vaultData.updatedAt = now;
 
             try {
                 const envelope = await encryptVaultPayload(vaultData, currentSessionPin);
                 const serialized = JSON.stringify(envelope, null, 2);
                 localStorage.setItem(VAULT_STORAGE_KEY, serialized);
+                lastKnownCloudCiphertext = envelope.ciphertext;
                 updateCiphertextInspector(envelope);
 
-                // Broadcast to other open tabs
                 if (broadcastChannel) {
                     broadcastChannel.postMessage({ type: 'VAULT_ENCRYPTED_UPDATE', envelope });
                 }
 
-                // If connected to a local file (.chronodoc in Google Drive/PC), write directly
                 if (localFileHandle) {
                     try {
                         const writable = await localFileHandle.createWritable();
@@ -1488,15 +1535,19 @@
                     }
                 }
 
-                setSyncStatus('synced', 'Tersimpan & Terenkripsi (AES-256)');
-
-                // Trigger debounced Cloud Auto-Sync if enabled
                 const cloudCfg = loadCloudConfig();
                 if (options.triggerCloud && cloudCfg.autoSync && cloudCfg.token) {
-                    if (cloudSyncDebounceTimer) clearTimeout(cloudSyncDebounceTimer);
-                    cloudSyncDebounceTimer = setTimeout(() => {
+                    setSyncStatus('syncing', 'Menyiapkan Auto-Sync Cloud...');
+                    if (cloudPushDebounceTimer) clearTimeout(cloudPushDebounceTimer);
+                    cloudPushDebounceTimer = setTimeout(() => {
+                        cloudPushDebounceTimer = null;
                         pushEncryptedVaultToCloud({ silent: true });
-                    }, 1800);
+                    }, 1200);
+                } else {
+                    isLocalDirty = false;
+                    setSyncStatus('synced', cloudCfg.token && cloudCfg.gistId
+                        ? `☁️ Auto-Sync Aktif (${formatTimeHMS(now)})`
+                        : 'Vault Terenkripsi Aktif (Lokal)');
                 }
             } catch (err) {
                 console.error('Encryption save error:', err);
@@ -1505,8 +1556,11 @@
         }
 
         function scheduleVaultSave() {
+            isLocalDirty = true;
+            lastLocalEditTime = Date.now();
             if (saveVaultDebounceTimer) clearTimeout(saveVaultDebounceTimer);
             saveVaultDebounceTimer = setTimeout(() => {
+                saveVaultDebounceTimer = null;
                 saveAndEncryptVault({ triggerCloud: true });
             }, 350);
         }
@@ -1517,11 +1571,11 @@
             if (!dot || !label) return;
             label.textContent = text;
             if (state === 'syncing') {
-                dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+                dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0';
             } else if (state === 'error') {
-                dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+                dot.className = 'w-2 h-2 rounded-full bg-rose-500 shrink-0';
             } else {
-                dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-500 shrink-0';
             }
         }
 
@@ -1533,38 +1587,97 @@
         }
 
         // ====================================================================
-        // G. ZERO-KNOWLEDGE CLOUD ENGINE (GitHub Secret Gist Relay)
+        // G. NATIVE TWO-WAY ZERO-KNOWLEDGE CLOUD ENGINE (Auto-Push + Auto-Read)
         // ====================================================================
         function loadCloudConfig() {
             try {
-                const raw = localStorage.getItem(CLOUD_CONFIG_KEY);
-                if (raw) return JSON.parse(raw);
-            } catch (e) {}
-            return { token: '', gistId: '', autoSync: false, lastSyncedAt: null };
+                // Read primary key or migrate from older keys if present
+                const rawMain = localStorage.getItem(CLOUD_CONFIG_KEY);
+                const rawLegacy1 = localStorage.getItem('chronodocs_permanent_sync');
+                const rawLegacy2 = localStorage.getItem('chronodocs_v2_sync_config');
+
+                let cfg = rawMain ? JSON.parse(rawMain) : {};
+                if ((!cfg.token || !cfg.gistId) && (rawLegacy1 || rawLegacy2)) {
+                    const legacy = JSON.parse(rawLegacy1 || rawLegacy2 || '{}');
+                    if (legacy.token) {
+                        cfg = {
+                            token: legacy.token.trim(),
+                            gistId: (legacy.gistId || cfg.gistId || '').trim(),
+                            autoSync: true,
+                            lastSyncedAt: Date.now()
+                        };
+                        localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cfg));
+                    }
+                }
+
+                // Default autoSync to true whenever token is configured
+                if (cfg.token && typeof cfg.autoSync !== 'boolean') {
+                    cfg.autoSync = true;
+                }
+                return {
+                    token: (cfg.token || '').trim(),
+                    gistId: (cfg.gistId || '').trim(),
+                    autoSync: cfg.autoSync !== false,
+                    lastSyncedAt: cfg.lastSyncedAt || null
+                };
+            } catch (e) {
+                return { token: '', gistId: '', autoSync: true, lastSyncedAt: null };
+            }
         }
 
         function saveCloudConfig(cfg) {
-            localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cfg));
+            const normalized = {
+                token: (cfg.token || '').trim(),
+                gistId: (cfg.gistId || '').trim(),
+                autoSync: cfg.autoSync !== false,
+                lastSyncedAt: cfg.lastSyncedAt || Date.now()
+            };
+            localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(normalized));
             populateCloudModalFields();
+            return normalized;
         }
 
         function populateCloudModalFields() {
             const cfg = loadCloudConfig();
-            document.getElementById('inputGithubToken').value = cfg.token || '';
-            document.getElementById('inputGistId').value = cfg.gistId || '';
-            document.getElementById('chkAutoCloudSync').checked = Boolean(cfg.autoSync);
-            const infoEl = document.getElementById('cloudLastSyncInfo');
-            if (cfg.lastSyncedAt) {
-                infoEl.textContent = `Sinkron terakhir: ${formatExactDate(cfg.lastSyncedAt)}`;
-            } else {
-                infoEl.textContent = 'Belum pernah disinkronkan ke Cloud';
+            const tokenEl = document.getElementById('inputGithubToken');
+            const gistEl  = document.getElementById('inputGistId');
+            const chkEl   = document.getElementById('chkAutoCloudSync');
+            const infoEl  = document.getElementById('cloudLastSyncInfo');
+
+            if (tokenEl) tokenEl.value = cfg.token || '';
+            if (gistEl)  gistEl.value  = cfg.gistId || '';
+            if (chkEl)   chkEl.checked = Boolean(cfg.autoSync);
+            if (infoEl) {
+                infoEl.textContent = cfg.lastSyncedAt
+                    ? `Sinkron terakhir: ${formatExactDate(cfg.lastSyncedAt)}`
+                    : 'Belum pernah disinkronkan ke Cloud';
             }
         }
 
+        // Persist immediately whenever user edits modal fields
+        function syncModalInputsToStorage() {
+            const current = loadCloudConfig();
+            const tokenVal = document.getElementById('inputGithubToken').value.trim();
+            const gistVal  = document.getElementById('inputGistId').value.trim();
+            const autoVal  = document.getElementById('chkAutoCloudSync').checked;
+            return saveCloudConfig({
+                token: tokenVal || current.token,
+                gistId: gistVal || current.gistId,
+                autoSync: autoVal,
+                lastSyncedAt: current.lastSyncedAt
+            });
+        }
+
+        // 1. AUTO-PUSH & MANUAL PUSH TO CLOUD (Reads directly from stored config)
         async function pushEncryptedVaultToCloud(options = { silent: false }) {
-            const token = document.getElementById('inputGithubToken').value.trim();
-            let gistId  = document.getElementById('inputGistId').value.trim();
-            const autoSync = document.getElementById('chkAutoCloudSync').checked;
+            const storedCfg = loadCloudConfig();
+            const domToken = document.getElementById('inputGithubToken')?.value.trim() || '';
+            const domGist  = document.getElementById('inputGistId')?.value.trim() || '';
+            const domAuto  = document.getElementById('chkAutoCloudSync')?.checked ?? true;
+
+            const token = domToken || storedCfg.token;
+            let gistId  = domGist  || storedCfg.gistId;
+            const autoSync = domAuto;
 
             if (!token) {
                 if (!options.silent) showToast('Masukkan GitHub Personal Access Token terlebih dahulu');
@@ -1577,7 +1690,9 @@
                 return;
             }
 
-            setSyncStatus('syncing', 'Mengirim ciphertext ke Cloud...');
+            if (isCloudSyncInFlight) return;
+            isCloudSyncInFlight = true;
+            setSyncStatus('syncing', '☁️ Mengirim ke Cloud...');
 
             try {
                 const payload = {
@@ -1610,14 +1725,21 @@
                 const data = await res.json();
                 gistId = data.id;
 
-                const newCfg = {
+                const now = Date.now();
+                saveCloudConfig({
                     token,
                     gistId,
                     autoSync,
-                    lastSyncedAt: Date.now()
-                };
-                saveCloudConfig(newCfg);
-                setSyncStatus('synced', 'Tersinkronisasi ke Zero-Knowledge Cloud');
+                    lastSyncedAt: now
+                });
+
+                try {
+                    lastKnownCloudCiphertext = JSON.parse(rawVault).ciphertext || '';
+                } catch (_) {}
+
+                isLocalDirty = false;
+                setSyncStatus('synced', `☁️ Tersinkronisasi (${formatTimeHMS(now)})`);
+
                 if (!options.silent) {
                     showToast('Vault terenkripsi berhasil disimpan ke Cloud (Gist ID: ' + gistId.slice(0, 8) + '...)');
                 }
@@ -1627,14 +1749,98 @@
                 if (!options.silent) {
                     showToast('Gagal mengirim ke Cloud. Periksa Token GitHub & izin "gist".');
                 }
+            } finally {
+                isCloudSyncInFlight = false;
             }
         }
 
-        async function pullEncryptedVaultFromCloud() {
-            const token = document.getElementById('inputGithubToken').value.trim();
-            const gistId = document.getElementById('inputGistId').value.trim();
+        // 2. NATIVE BACKGROUND AUTO-READ (Polls every 6s + on Unlock + on Tab Focus)
+        async function autoCheckAndPullFromCloud(options = { isInitialUnlock: false, manualTrigger: false }) {
+            if (isVaultLocked || !currentSessionPin) return;
+            if (isCloudSyncInFlight) return;
 
-            if (!token || !gistId) {
+            // Never interrupt or overwrite while the user is actively typing or waiting to push local changes
+            if (!options.isInitialUnlock && !options.manualTrigger) {
+                if (isLocalDirty || saveVaultDebounceTimer || cloudPushDebounceTimer || (Date.now() - lastLocalEditTime < 3500)) {
+                    return;
+                }
+            }
+
+            const cfg = loadCloudConfig();
+            if (!cfg.token || !cfg.gistId) return;
+            if (!cfg.autoSync && !options.manualTrigger && !options.isInitialUnlock) return;
+
+            isCloudSyncInFlight = true;
+            if (options.isInitialUnlock || options.manualTrigger) {
+                setSyncStatus('syncing', '☁️ Mengecek pembaruan Cloud...');
+            }
+
+            try {
+                // Cache-busting query param + cache: 'no-store' forces fresh Gist read on mobile & desktop
+                const res = await fetch(`https://api.github.com/gists/${cfg.gistId}?_t=${Date.now()}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${cfg.token}`,
+                        'Accept': 'application/vnd.github+json'
+                    },
+                    cache: 'no-store'
+                });
+
+                if (!res.ok) throw new Error(`GitHub API (${res.status})`);
+                const data = await res.json();
+                const fileObj = data.files['chronodocs_vault.chronodoc'] || data.files['vault.chronodoc'] || Object.values(data.files)[0];
+                if (!fileObj || !fileObj.content) return;
+
+                const cloudEnvelope = JSON.parse(fileObj.content);
+                const cloudCiphertext = cloudEnvelope.ciphertext || cloudEnvelope.ct || '';
+                const cloudTime = cloudEnvelope.updatedAt || cloudEnvelope.ts || 0;
+                const localTime = vaultData.updatedAt || 0;
+
+                // Check if Cloud has newer edits than this device
+                const isCloudNewer = cloudTime > localTime && cloudCiphertext !== lastKnownCloudCiphertext;
+                const shouldForceApply = options.manualTrigger && cloudCiphertext !== lastKnownCloudCiphertext;
+
+                if (isCloudNewer || shouldForceApply) {
+                    const decrypted = await decryptVaultPayload(cloudEnvelope, currentSessionPin);
+                    vaultData = decrypted;
+                    vaultData.updatedAt = cloudTime || decrypted.updatedAt || Date.now();
+                    lastKnownCloudCiphertext = cloudCiphertext;
+
+                    // Store the cloud envelope directly without re-encrypting so timestamps remain identical across devices
+                    localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(cloudEnvelope, null, 2));
+                    updateCiphertextInspector(cloudEnvelope);
+
+                    saveCloudConfig({
+                        ...cfg,
+                        lastSyncedAt: Date.now()
+                    });
+
+                    renderAll({ preserveFocus: false });
+                    setSyncStatus('synced', `☁️ Tersinkronisasi (${formatTimeHMS(Date.now())})`);
+                    showToast('☁️ Catatan terbaru otomatis dimuat dari Cloud!');
+                } else if (localTime > cloudTime && isLocalDirty) {
+                    // Local device has unpushed newer edits -> push them now
+                    isCloudSyncInFlight = false;
+                    await pushEncryptedVaultToCloud({ silent: true });
+                    return;
+                } else {
+                    lastKnownCloudCiphertext = cloudCiphertext || lastKnownCloudCiphertext;
+                    setSyncStatus('synced', `☁️ Auto-Sync Aktif (${formatTimeHMS(Date.now())})`);
+                }
+            } catch (err) {
+                console.warn('Auto-Read check skipped:', err.message);
+                if (options.manualTrigger) {
+                    setSyncStatus('error', 'Gagal mengecek Cloud');
+                }
+            } finally {
+                isCloudSyncInFlight = false;
+            }
+        }
+
+        // 3. MANUAL PULL BUTTON IN SYNC MODAL (Works both when locked and unlocked)
+        async function pullEncryptedVaultFromCloud() {
+            const cfg = syncModalInputsToStorage();
+            if (!cfg.token || !cfg.gistId) {
                 showToast('Masukkan GitHub Token dan ID Gist untuk menarik data dari Cloud');
                 return;
             }
@@ -1642,16 +1848,18 @@
             setSyncStatus('syncing', 'Menarik ciphertext dari Cloud...');
 
             try {
-                const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+                const res = await fetch(`https://api.github.com/gists/${cfg.gistId}?_t=${Date.now()}`, {
+                    method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${cfg.token}`,
                         'Accept': 'application/vnd.github+json'
-                    }
+                    },
+                    cache: 'no-store'
                 });
 
                 if (!res.ok) throw new Error(`GitHub API (${res.status})`);
                 const data = await res.json();
-                const fileObj = data.files['chronodocs_vault.chronodoc'] || Object.values(data.files)[0];
+                const fileObj = data.files['chronodocs_vault.chronodoc'] || data.files['vault.chronodoc'] || Object.values(data.files)[0];
                 if (!fileObj || !fileObj.content) {
                     throw new Error('File vault tidak ditemukan di dalam Gist');
                 }
@@ -1660,9 +1868,9 @@
                 localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(envelope, null, 2));
 
                 saveCloudConfig({
-                    token,
-                    gistId,
-                    autoSync: document.getElementById('chkAutoCloudSync').checked,
+                    token: cfg.token,
+                    gistId: cfg.gistId,
+                    autoSync: true,
                     lastSyncedAt: Date.now()
                 });
 
@@ -1670,13 +1878,13 @@
                     try {
                         const decrypted = await decryptVaultPayload(envelope, currentSessionPin);
                         vaultData = decrypted;
-                        renderAll();
+                        lastKnownCloudCiphertext = envelope.ciphertext || envelope.ct || '';
+                        renderAll({ preserveFocus: false });
                         document.getElementById('cloudSyncModal').classList.add('hidden');
-                        setSyncStatus('synced', 'Data Cloud berhasil dibuka');
+                        setSyncStatus('synced', `☁️ Tersinkronisasi (${formatTimeHMS(Date.now())})`);
                         showToast('Data terbaru dari Cloud berhasil ditarik & didekripsi!');
                         return;
                     } catch (decErr) {
-                        // Different PIN used on cloud vault; lock and ask for PIN
                         document.getElementById('cloudSyncModal').classList.add('hidden');
                         lockVaultImmediately('Data Cloud ditarik! Masukkan PIN 6 angka untuk membukanya.');
                         return;
@@ -1815,7 +2023,6 @@
             showToast('Lembar baru ditambahkan di Halaman 1 (Paling Atas)');
         }
 
-        // Fold / Collapse Functions
         function toggleSingleSheetFold(sheetId) {
             const { sheet } = findSheetAndTopicById(sheetId);
             if (!sheet) return;
@@ -1845,7 +2052,6 @@
             showToast(collapsedState ? 'Semua lembar dilipat' : 'Semua lembar dibuka');
         }
 
-        // Print Single Sheet Only
         function printSingleSheet(sheetId) {
             const { sheet, topic } = findSheetAndTopicById(sheetId);
             if (!sheet) return;
@@ -1924,6 +2130,7 @@
                     const tp = getActiveTopic();
                     activeSheetId = tp && tp.sheets.length > 0 ? getSortedSheetsForTopic(tp)[0].id : null;
                     renderAll();
+                    scheduleVaultSave();
                     if (window.innerWidth < 1024) {
                         document.getElementById('leftSidebar').classList.add('max-lg:-translate-x-full');
                     }
@@ -1937,7 +2144,6 @@
                 });
             });
 
-            // Update Center Topic Banner
             if (activeTopic) {
                 document.getElementById('activeTopicIconBox').textContent = activeTopic.icon || '📘';
                 document.getElementById('activeTopicTitle').textContent = activeTopic.name;
@@ -1990,10 +2196,9 @@
                         <!-- Top Accent Strip -->
                         <div class="h-1.5 w-full ${sheet.pinned ? 'bg-amber-400' : isNewestTop ? 'bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-500' : 'bg-slate-200 dark:bg-slate-800'}"></div>
 
-                        <!-- Sheet Header Bar (Always visible, acts as Folded Summary Bar when collapsed) -->
+                        <!-- Sheet Header Bar -->
                         <div class="px-4 sm:px-7 py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
                             <div class="flex items-center gap-2 min-w-0 flex-1">
-                                <!-- Fold / Collapse Toggle Button -->
                                 <button
                                     type="button"
                                     data-action="fold"
@@ -2024,7 +2229,6 @@
                                     </span>
                                 ` : ''}
 
-                                <!-- When Collapsed, show Title Preview right in the header bar -->
                                 <span
                                     data-collapsed-title="${sheet.id}"
                                     class="${isCollapsed ? 'inline-block' : 'hidden sm:inline-block'} font-semibold text-slate-800 dark:text-slate-200 truncate ml-1 cursor-pointer"
@@ -2154,13 +2358,11 @@
             const badge = document.getElementById('timelineCountBadge');
             if (badge) badge.textContent = `${filtered.length} Hal`;
 
-            // Global Footer Stats
             let totalSheetsAll = 0;
             vaultData.topics.forEach(t => { totalSheetsAll += (t.sheets || []).length; });
             const statsEl = document.getElementById('globalStatsText');
             if (statsEl) statsEl.textContent = `${vaultData.topics.length} Topik • ${totalSheetsAll} Lembar`;
 
-            // Active Topic Hashtags
             const activeTopic = getActiveTopic();
             const tagSet = new Set();
             if (activeTopic) {
@@ -2196,7 +2398,6 @@
                 tagSection.classList.add('hidden');
             }
 
-            // Render Right Floating Timeline Jumper
             timelineList.innerHTML = filtered.map((sheet, idx) => {
                 const pageNo = idx + 1;
                 const isCurrent = sheet.id === activeSheetId;
@@ -2211,7 +2412,6 @@
                                 : 'hover:bg-slate-100 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-300'
                         }"
                     >
-                        <!-- Timeline Dot on Left Border -->
                         <span class="w-2.5 h-2.5 rounded-full absolute -left-[18px] top-3.5 border-2 border-white dark:border-slate-900 ${
                             idx === 0 && sortDirection === 'newest' ? 'bg-brand-600' : isCurrent ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-700'
                         }"></span>
@@ -2288,7 +2488,6 @@
                     }
                 });
 
-                // Click image inside editor to cycle width: 25% -> 50% -> 75% -> 100%
                 editor.addEventListener('click', (e) => {
                     if (e.target && e.target.tagName === 'IMG') {
                         const img = e.target;
@@ -2538,7 +2737,6 @@
             showToast('Topik berhasil disimpan');
         }
 
-        // Connect Local Vault File (.chronodoc) via File System Access API
         async function connectLocalVaultFile() {
             if ('showSaveFilePicker' in window) {
                 try {
@@ -2553,9 +2751,7 @@
                     document.getElementById('localFileStatusBadge').className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold';
                     await saveAndEncryptVault({ triggerCloud: false });
                     showToast('File lokal .chronodoc terhubung! Setiap perubahan otomatis ditulis ke file.');
-                } catch (e) {
-                    // User cancelled picker
-                }
+                } catch (e) {}
             } else {
                 exportEncryptedVaultFile();
             }
@@ -2580,7 +2776,7 @@
             reader.onload = async (ev) => {
                 try {
                     const parsed = JSON.parse(ev.target.result);
-                    if (parsed && parsed.ciphertext && parsed.salt && parsed.iv) {
+                    if (parsed && (parsed.ciphertext || parsed.ct) && parsed.salt && parsed.iv) {
                         localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(parsed, null, 2));
                         document.getElementById('cloudSyncModal').classList.add('hidden');
                         lockVaultImmediately('File Vault berhasil dimuat! Masukkan PIN 6 angka untuk membukanya.');
@@ -2594,7 +2790,6 @@
             reader.readAsText(file);
         }
 
-        // Formatting & Extraction Utilities
         const fullDateFormatter = new Intl.DateTimeFormat('id-ID', {
             day: '2-digit', month: 'short', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
@@ -2605,6 +2800,12 @@
 
         function formatExactDate(ts) { return ts ? fullDateFormatter.format(new Date(ts)) : '-'; }
         function formatShortDate(ts) { return ts ? shortDateFormatter.format(new Date(ts)) : '-'; }
+        function formatTimeHMS(ts) {
+            const d = new Date(ts || Date.now());
+            return String(d.getHours()).padStart(2, '0') + ':' +
+                   String(d.getMinutes()).padStart(2, '0') + ':' +
+                   String(d.getSeconds()).padStart(2, '0');
+        }
 
         function formatRelativeTime(ts) {
             if (!ts) return '';
@@ -2715,7 +2916,7 @@
         }
 
         // ====================================================================
-        // L. INITIALIZE ALL EVENT LISTENERS & SHORTCUTS
+        // L. INITIALIZE ALL EVENT LISTENERS, SHORTCUTS & 6s AUTO-SYNC HEARTBEAT
         // ====================================================================
         function initEventListeners() {
             // 1. PIN Keypad & Keyboard Input
@@ -2751,7 +2952,6 @@
             window.addEventListener('keydown', (e) => {
                 lastActivityTime = Date.now();
 
-                // If Lock Screen is open and no modal is covering it, capture digits 0-9
                 const anyModalOpen = !document.getElementById('cloudSyncModal').classList.contains('hidden') ||
                                      !document.getElementById('deleteModal').classList.contains('hidden');
                 if (isVaultLocked && !anyModalOpen) {
@@ -2778,20 +2978,17 @@
                     lastEscapePressTime = now;
                 }
 
-                // Alt+N: New Sheet at Top
                 if (e.altKey && e.key.toLowerCase() === 'n') {
                     e.preventDefault();
                     createNewSheetAtTop();
                 }
 
-                // Alt+Z: Zen Mode
                 if (e.altKey && e.key.toLowerCase() === 'z') {
                     e.preventDefault();
                     toggleZenMode();
                 }
             });
 
-            // Track activity for Auto-Lock Idle Timer
             ['mousemove', 'mousedown', 'touchstart', 'scroll'].forEach(evt => {
                 window.addEventListener(evt, () => { lastActivityTime = Date.now(); }, { passive: true });
             });
@@ -2823,7 +3020,6 @@
                 btn.addEventListener('click', () => applyCustomBlockStyle(btn.getAttribute('data-block')));
             });
 
-            // Highlight Popover
             const hlBtn = document.getElementById('btnHighlightPicker');
             const hlPop = document.getElementById('highlightPopover');
             hlBtn.addEventListener('click', (e) => {
@@ -2860,7 +3056,6 @@
                 hlPop.classList.add('hidden');
             });
 
-            // Checklist, Divider, Timestamp
             document.getElementById('btnInsertChecklist').addEventListener('click', () => {
                 const editor = restoreSelectionAndFocus();
                 if (!editor) return;
@@ -2950,12 +3145,29 @@
                 imgModal.classList.add('hidden');
             });
 
-            // 6. Top Bar Controls: New Sheet, Fold/Unfold, Sort, Search, Sidebars, Zen, Theme
+            // 6. Top Bar & Mobile Bottom Nav Controls
             document.getElementById('btnNewSheetTop').addEventListener('click', createNewSheetAtTop);
             document.getElementById('btnNewSheetFromEmpty').addEventListener('click', createNewSheetAtTop);
             document.getElementById('btnFoldOldSheets').addEventListener('click', foldOlderSheetsKeepTopOpen);
             document.getElementById('btnUnfoldAllSheets').addEventListener('click', () => setAllSheetsFoldState(false));
             document.getElementById('btnFoldAllSheets').addEventListener('click', () => setAllSheetsFoldState(true));
+            document.getElementById('btnQuickSyncCheck').addEventListener('click', () => autoCheckAndPullFromCloud({ manualTrigger: true }));
+
+            // Mobile Bottom Navigation Bar Bindings
+            document.getElementById('btnMobileTopics').addEventListener('click', () => {
+                document.getElementById('leftSidebar').classList.toggle('max-lg:-translate-x-full');
+            });
+            document.getElementById('btnMobileSync').addEventListener('click', () => {
+                populateCloudModalFields();
+                document.getElementById('cloudSyncModal').classList.remove('hidden');
+            });
+            document.getElementById('btnMobileNewSheet').addEventListener('click', createNewSheetAtTop);
+            document.getElementById('btnMobileTimeline').addEventListener('click', () => {
+                document.getElementById('rightTimelineSidebar').classList.toggle('max-xl:translate-x-full');
+            });
+            document.getElementById('btnMobileLock').addEventListener('click', () => {
+                lockVaultImmediately('Vault dikunci secara manual');
+            });
 
             document.getElementById('btnToggleSort').addEventListener('click', () => {
                 sortDirection = (sortDirection === 'newest') ? 'oldest' : 'newest';
@@ -3039,23 +3251,32 @@
                 document.getElementById('deleteModal').classList.remove('hidden');
             });
 
-            // 8. Cloud Sync & Local Vault File Events
+            // 8. Cloud Sync & Local Vault File Events (Auto-Save Config on Change)
             document.getElementById('btnOpenCloudModal').addEventListener('click', () => {
                 populateCloudModalFields();
                 document.getElementById('cloudSyncModal').classList.remove('hidden');
             });
-            document.getElementById('btnCloseCloudModal').addEventListener('click', () => document.getElementById('cloudSyncModal').classList.add('hidden'));
-            document.getElementById('btnCloudPushNow').addEventListener('click', () => pushEncryptedVaultToCloud({ silent: false }));
+            document.getElementById('btnCloseCloudModal').addEventListener('click', () => {
+                syncModalInputsToStorage();
+                document.getElementById('cloudSyncModal').classList.add('hidden');
+            });
+            document.getElementById('inputGithubToken').addEventListener('input', syncModalInputsToStorage);
+            document.getElementById('inputGistId').addEventListener('input', syncModalInputsToStorage);
+            document.getElementById('chkAutoCloudSync').addEventListener('change', syncModalInputsToStorage);
+
+            document.getElementById('btnCloudPushNow').addEventListener('click', () => {
+                syncModalInputsToStorage();
+                pushEncryptedVaultToCloud({ silent: false });
+            });
             document.getElementById('btnCloudPullNow').addEventListener('click', pullEncryptedVaultFromCloud);
 
             document.getElementById('btnCopyPairingCode').addEventListener('click', () => {
-                const token = document.getElementById('inputGithubToken').value.trim();
-                const gistId = document.getElementById('inputGistId').value.trim();
-                if (!token || !gistId) {
+                const cfg = syncModalInputsToStorage();
+                if (!cfg.token || !cfg.gistId) {
                     showToast('Simpan ke Cloud minimal 1 kali agar Gist ID terbentuk sebelum menyalin Kode Pairing.');
                     return;
                 }
-                const code = btoa(JSON.stringify({ t: token, g: gistId }));
+                const code = btoa(JSON.stringify({ t: cfg.token, g: cfg.gistId }));
                 const temp = document.createElement('textarea');
                 temp.value = code;
                 document.body.appendChild(temp);
@@ -3069,11 +3290,12 @@
                 const rawCode = document.getElementById('inputPairingCode').value.trim();
                 if (!rawCode) return;
                 try {
-                    const decoded = JSON.parse(atob(rawCode));
-                    if (decoded.t && decoded.g) {
-                        document.getElementById('inputGithubToken').value = decoded.t;
-                        document.getElementById('inputGistId').value = decoded.g;
-                        saveCloudConfig({ token: decoded.t, gistId: decoded.g, autoSync: true, lastSyncedAt: null });
+                    const cleanBase64 = rawCode.startsWith('CHRONO-') ? rawCode.replace('CHRONO-', '') : rawCode;
+                    const decoded = JSON.parse(atob(cleanBase64));
+                    const token = decoded.t || decoded.token;
+                    const gistId = decoded.g || decoded.gistId;
+                    if (token && gistId) {
+                        saveCloudConfig({ token, gistId, autoSync: true, lastSyncedAt: Date.now() });
                         showToast('Kode Pairing diterapkan! Menarik data terenkripsi dari Cloud...');
                         pullEncryptedVaultFromCloud();
                     }
@@ -3160,12 +3382,10 @@
                 pendingDeleteAction = null;
             });
 
-            // Close highlight popover on outside click
             window.addEventListener('click', () => {
                 document.getElementById('highlightPopover').classList.add('hidden');
             });
 
-            // Cross-Tab Broadcast Listener
             if (broadcastChannel) {
                 broadcastChannel.onmessage = async (event) => {
                     if (event.data?.type === 'VAULT_ENCRYPTED_UPDATE' && !isVaultLocked && currentSessionPin) {
@@ -3178,6 +3398,16 @@
                     }
                 };
             }
+
+            // 11. Instant Auto-Read when switching back to tab or waking phone screen
+            window.addEventListener('focus', () => {
+                autoCheckAndPullFromCloud({ isInitialUnlock: false, manualTrigger: false });
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    autoCheckAndPullFromCloud({ isInitialUnlock: false, manualTrigger: false });
+                }
+            });
         }
 
         function insertImageIntoEditor(src) {
@@ -3199,13 +3429,14 @@
             showToast(!isHidden ? 'Mode Fokus (Zen Mode) Aktif — Tekan Alt+Z untuk keluar' : 'Mode Fokus Dinonaktifkan');
         }
 
-        // Auto-Lock Idle Watcher & Relative Timestamp Refresher
+        // NATIVE 6-SECOND HEARTBEAT: Auto-Read Cloud + Auto-Lock Idle Watcher
         setInterval(() => {
             if (!isVaultLocked && autoLockMinutes > 0) {
                 const idleMs = Date.now() - lastActivityTime;
                 const limitMs = autoLockMinutes * 60 * 1000;
                 if (idleMs >= limitMs) {
                     lockVaultImmediately(`Vault dikunci otomatis setelah ${autoLockMinutes} menit tanpa aktivitas`);
+                    return;
                 }
             }
             if (!isVaultLocked) {
@@ -3213,8 +3444,10 @@
                 if (activeTopic) {
                     activeTopic.sheets.forEach(s => updateSheetMetaDOM(s));
                 }
+                // Check Gist every 6 seconds for updates from other devices
+                autoCheckAndPullFromCloud({ isInitialUnlock: false, manualTrigger: false });
             }
-        }, 10000);
+        }, 6000);
 
         // Initialize App on Load
         window.addEventListener('DOMContentLoaded', () => {
@@ -3228,309 +3461,12 @@
                 }
             } catch (e) {}
 
+            // Pre-populate Cloud Token & Gist ID immediately on startup!
+            populateCloudModalFields();
             lucide.createIcons();
             initEventListeners();
             initLockScreenState();
         });
     </script>
-
-<!-- PATCH FINAL TWO-WAY LIVE SYNC: AUTO-WRITE + AUTO-READ 4 DETIK + PERMANENT TOKEN -->
-<style>
-  @media (max-width: 768px) {
-    header > div:first-child {
-      overflow-x: auto !important;
-      -webkit-overflow-scrolling: touch;
-      gap: 0.5rem !important;
-    }
-    header > div:first-child > * {
-      flex-shrink: 0 !important;
-    }
-    body {
-      padding-bottom: 72px !important;
-    }
-  }
-</style>
-
-<!-- Bilah Tombol Bawah Khusus Layar HP -->
-<nav class="md:hidden fixed bottom-0 inset-x-0 z-[90] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-2 flex items-center justify-around shadow-2xl">
-  <button onclick="document.querySelector('header button')?.click()" class="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
-    <span>📚 Topik</span>
-  </button>
-  <button onclick="(typeof openSyncModal === 'function') ? openSyncModal() : document.querySelector('[title*=Sync], [onclick*=Sync]')?.click()" class="flex flex-col items-center gap-0.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
-    <span>☁️ Sync</span>
-  </button>
-  <button onclick="(typeof createNewSheet === 'function') ? createNewSheet() : document.querySelector('[onclick*=Sheet], [onclick*=Lembar]')?.click()" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow">
-    + Lembar Baru
-  </button>
-  <button onclick="(typeof openSecurityModal === 'function') ? openSecurityModal() : document.querySelector('[title*=PIN], [onclick*=Security]')?.click()" class="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-    <span>🛡️ Auto-Lock</span>
-  </button>
-  <button onclick="(typeof lockVaultNow === 'function') ? lockVaultNow() : document.querySelector('[onclick*=lock], [onclick*=Kunci]')?.click()" class="flex flex-col items-center gap-0.5 text-[10px] font-bold text-rose-600 dark:text-rose-400">
-    <span>🔒 Kunci</span>
-  </button>
-</nav>
-
-<script>
-  (function() {
-    let writeDebounceTimer = null;
-    let isNetworkBusy = false;
-    let lastTypingTime = 0;
-    let lastSeenCloudCipher = '';
-    let lastPushedLocalCipher = '';
-
-    function isUnlocked() {
-      const lockEl = document.getElementById('lockScreen');
-      return lockEl && lockEl.classList.contains('hidden');
-    }
-
-    function setLiveStatus(text, colorClass) {
-      const dot = document.getElementById('syncDot');
-      const txt = document.getElementById('syncStatusText');
-      if (dot) dot.className = 'w-1.5 h-1.5 rounded-full ' + colorClass;
-      if (txt) txt.textContent = text;
-    }
-
-    // 1. SIMPAN TOKEN & GIST ID PERMANEN (Baik saat klik Simpan, Tarik dari Cloud, Hubungkan, maupun saat mengetik di kotak input)
-    function saveCredsPermanently(token, gistId) {
-      const t = (token || '').trim();
-      const g = (gistId || '').trim();
-      if (!t) return;
-
-      const prev = getSavedCreds() || {};
-      const finalGistId = g || prev.gistId || '';
-
-      const payload = { token: t, gistId: finalGistId, autoCloud: true, updatedAt: Date.now() };
-      localStorage.setItem('chronodocs_permanent_sync', JSON.stringify(payload));
-      localStorage.setItem('chronodocs_v2_sync_config', JSON.stringify(payload));
-    }
-
-    function getSavedCreds() {
-      try {
-        const p = localStorage.getItem('chronodocs_permanent_sync');
-        if (p) {
-          const parsed = JSON.parse(p);
-          if (parsed && parsed.token) return parsed;
-        }
-        const v2 = localStorage.getItem('chronodocs_v2_sync_config');
-        if (v2) {
-          const parsed2 = JSON.parse(v2);
-          if (parsed2 && parsed2.token) {
-            localStorage.setItem('chronodocs_permanent_sync', JSON.stringify(parsed2));
-            return parsed2;
-          }
-        }
-      } catch (_) {}
-      return null;
-    }
-
-    function captureInputsFromModal() {
-      const tEl = document.querySelector('#syncTokenInput, #gistTokenInput');
-      const gEl = document.querySelector('#syncGistIdInput, #gistIdInput');
-      const pEl = document.getElementById('pairingCodeInput');
-
-      // Jika pengguna menempelkan Kode Pairing (CHRONO-...), langsung ekstrak Token & Gist ID-nya
-      if (pEl && pEl.value && pEl.value.trim().startsWith('CHRONO-')) {
-        try {
-          const decoded = JSON.parse(atob(pEl.value.trim().replace('CHRONO-', '')));
-          if (decoded.token) {
-            saveCredsPermanently(decoded.token, decoded.gistId || '');
-            if (tEl) tEl.value = decoded.token;
-            if (gEl) gEl.value = decoded.gistId || '';
-            return;
-          }
-        } catch (_) {}
-      }
-
-      if (tEl && tEl.value.trim()) {
-        saveCredsPermanently(tEl.value, gEl ? gEl.value : '');
-      }
-    }
-
-    function syncCredsToDOMInputs() {
-      const creds = getSavedCreds();
-      if (!creds) return null;
-
-      const tInputs = document.querySelectorAll('#syncTokenInput, #gistTokenInput');
-      const gInputs = document.querySelectorAll('#syncGistIdInput, #gistIdInput');
-      const aInputs = document.querySelectorAll('#autoCloudSyncToggle');
-
-      tInputs.forEach(el => { if (el) el.value = creds.token; });
-      gInputs.forEach(el => { if (el && creds.gistId) el.value = creds.gistId; });
-      aInputs.forEach(el => { if (el) el.checked = true; });
-      return creds;
-    }
-
-    function getLocalVaultCipher() {
-      return localStorage.getItem('chronodocs_v2_encrypted_vault') || localStorage.getItem('chronodocs_vault') || '';
-    }
-
-    // 2. MESIN AUTO-WRITE (Kirim ke Cloud setelah berhenti mengetik)
-    async function autoWriteToCloud() {
-      if (!isUnlocked() || isNetworkBusy) return;
-      const creds = syncCredsToDOMInputs();
-      if (!creds || !creds.token || !creds.gistId) return;
-
-      const localCipher = getLocalVaultCipher();
-      if (!localCipher || localCipher === lastPushedLocalCipher) return;
-
-      isNetworkBusy = true;
-      setLiveStatus('Mengirim ke Cloud...', 'bg-amber-500');
-
-      try {
-        const res = await fetch('https://api.github.com/gists/' + creds.gistId, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': 'token ' + creds.token,
-            'Accept': 'application/vnd.github+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            files: { 'vault.chronodoc': { content: localCipher } }
-          })
-        });
-
-        if (res.ok) {
-          lastPushedLocalCipher = localCipher;
-          lastSeenCloudCipher = localCipher;
-          setLiveStatus('☁️ Live Sync Aktif (Tersimpan)', 'bg-emerald-500');
-        }
-      } catch (e) {
-        console.warn('Auto-Write gagal:', e.message);
-      } finally {
-        isNetworkBusy = false;
-      }
-    }
-
-    // 3. MESIN AUTO-READ (Cek Cloud tiap 4 detik & tarik otomatis jika ada perubahan dari perangkat lain)
-    async function autoReadFromCloud(forcePullOnUnlock = false) {
-      if (!isUnlocked() || isNetworkBusy) return;
-
-      // Jangan ganggu jika pengguna sedang aktif mengetik di perangkat ini (dalam 4 detik terakhir)
-      if (!forcePullOnUnlock && (Date.now() - lastTypingTime < 4000 || writeDebounceTimer !== null)) {
-        return;
-      }
-
-      const creds = syncCredsToDOMInputs();
-      if (!creds || !creds.token || !creds.gistId) return;
-
-      isNetworkBusy = true;
-      try {
-        // Tambahkan timestamp ?_=... & cache: 'no-store' agar browser tidak membaca cache lama
-        const res = await fetch('https://api.github.com/gists/' + creds.gistId + '?_=' + Date.now(), {
-          method: 'GET',
-          headers: {
-            'Authorization': 'token ' + creds.token,
-            'Accept': 'application/vnd.github+json'
-          },
-          cache: 'no-store'
-        });
-
-        if (!res.ok) return;
-        const data = await res.json();
-        const fileObj = data.files['vault.chronodoc'] || Object.values(data.files)[0];
-        if (!fileObj || !fileObj.content) return;
-
-        const cloudCipher = fileObj.content;
-        const localCipher = getLocalVaultCipher();
-
-        // Jika isi Cloud sama persis dengan yang sudah kita lihat sebelumnya, tidak perlu re-render layar
-        if (!forcePullOnUnlock && (cloudCipher === lastSeenCloudCipher || cloudCipher === localCipher)) {
-          lastSeenCloudCipher = cloudCipher;
-          setLiveStatus('☁️ Live Sync Aktif', 'bg-emerald-500');
-          return;
-        }
-
-        // Bandingkan waktu pembuatan amplop enkripsi (ts) agar data lama tidak menimpa data baru
-        let cloudTs = 0, localTs = 0;
-        try { cloudTs = JSON.parse(cloudCipher).ts || 0; } catch (_) {}
-        try { localTs = localCipher ? (JSON.parse(localCipher).ts || 0) : 0; } catch (_) {}
-
-        if (cloudTs >= localTs || forcePullOnUnlock) {
-          lastSeenCloudCipher = cloudCipher;
-          syncCredsToDOMInputs();
-
-          if (typeof pullFromCloudGist === 'function') {
-            await pullFromCloudGist();
-          } else {
-            const pullBtn = document.querySelector('button[onclick*="pullFromCloud"]');
-            if (pullBtn) pullBtn.click();
-          }
-
-          // Catat cipher lokal terbaru setelah dekripsi agar tidak di-push balik ke Cloud
-          setTimeout(() => {
-            lastPushedLocalCipher = getLocalVaultCipher();
-            setLiveStatus('☁️ Live Sync Aktif (Terbaru)', 'bg-emerald-500');
-          }, 400);
-        } else {
-          lastSeenCloudCipher = cloudCipher;
-        }
-      } catch (e) {
-        console.warn('Auto-Read dilewati:', e.message);
-      } finally {
-        isNetworkBusy = false;
-      }
-    }
-
-    // Rekam Token setiap kali pengguna mengetik/menempel di kolom input Sync Modal
-    document.addEventListener('input', (e) => {
-      if (e.target && e.target.closest('#syncModal')) {
-        captureInputsFromModal();
-      }
-      // Jika mengetik di lembar catatan, jadwalkan Auto-Write 1.8 detik setelah berhenti mengetik
-      if (isUnlocked() && e.target && (e.target.isContentEditable || e.target.closest('[contenteditable="true"]'))) {
-        lastTypingTime = Date.now();
-        setLiveStatus('Menyimpan ketikan...', 'bg-amber-500');
-        clearTimeout(writeDebounceTimer);
-        writeDebounceTimer = setTimeout(() => {
-          writeDebounceTimer = null;
-          autoWriteToCloud();
-        }, 1800);
-      }
-    }, true);
-
-    // Rekam Token juga saat tombol APA PUN di dalam Sync Modal diklik (Tarik dari Cloud, Hubungkan, Simpan)
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('button');
-      if (!btn) return;
-
-      if (btn.closest('#syncModal')) {
-        captureInputsFromModal();
-        setTimeout(captureInputsFromModal, 800);
-      } else if (isUnlocked() && !btn.closest('#lockScreen')) {
-        // Jika klik tombol + Lembar Baru / Hapus / Pin, dorong perubahan ke Cloud
-        setTimeout(() => {
-          if (!writeDebounceTimer) autoWriteToCloud();
-        }, 1000);
-      }
-    }, true);
-
-    // Jalankan saat halaman dibuka & pasang interval Auto-Read setiap 4 detik
-    window.addEventListener('DOMContentLoaded', () => {
-      syncCredsToDOMInputs();
-
-      const lockEl = document.getElementById('lockScreen');
-      if (lockEl) {
-        const obs = new MutationObserver(() => {
-          if (lockEl.classList.contains('hidden')) {
-            syncCredsToDOMInputs();
-            setTimeout(() => autoReadFromCloud(true), 400);
-          }
-        });
-        obs.observe(lockEl, { attributes: true, attributeFilter: ['class'] });
-      }
-
-      // Pengecekan berkala otomatis setiap 4 detik (membaca kiriman dari perangkat lain tanpa reload)
-      setInterval(() => {
-        autoReadFromCloud(false);
-      }, 4000);
-    });
-
-    // Langsung cek Cloud saat berpindah tab atau layar HP menyala kembali
-    window.addEventListener('focus', () => autoReadFromCloud(false));
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') autoReadFromCloud(false);
-    });
-  })();
-</script>
 </body>
 </html>
