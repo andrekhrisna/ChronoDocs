@@ -3233,7 +3233,7 @@
             initLockScreenState();
         });
     </script>
-<!-- PATCH LENGKAP: RESPONSIVE HP + AUTO-PULL & AUTO-SYNC PINTAR -->
+<!-- PATCH FINAL: RESPONSIVE HP + AUTO-PULL OTOMATIS (KOMPATIBEL 100% DENGAN FILE 178 KB) -->
 <style>
   @media (max-width: 768px) {
     header > div:first-child {
@@ -3271,96 +3271,90 @@
 
 <script>
   (function() {
-    let isCheckingCloud = false;
+    let lastAutoPullTime = 0;
 
-    // 1. Paksa aktifkan centang Auto-Sync secara otomatis jika Token & Gist ID sudah terisi
-    function ensureAutoSyncEnabled() {
+    // 1. Pastikan opsi Auto-Sync ke Cloud selalu aktif otomatis
+    function forceEnableAutoCloud() {
       try {
-        if (typeof getSyncConfig === 'function') {
-          const cfg = getSyncConfig();
-          if (cfg && cfg.token && cfg.gistId && cfg.autoCloud === undefined) {
-            cfg.autoCloud = true;
-            localStorage.setItem('chronodocs_v2_sync_config', JSON.stringify(cfg));
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.includes('sync')) {
+            const cfg = JSON.parse(localStorage.getItem(k) || '{}');
+            if (cfg.token && cfg.gistId && !cfg.autoCloud) {
+              cfg.autoCloud = true;
+              localStorage.setItem(k, JSON.stringify(cfg));
+            }
           }
         }
       } catch (_) {}
     }
 
-    // 2. Fungsi Smart Auto-Pull (Hanya menarik jika data di Cloud lebih baru)
-    async function smartAutoPullFromCloud(showNotification = true) {
-      if (isCheckingCloud) return;
-      if (typeof activePin === 'undefined' || !activePin) return;
-      if (typeof getSyncConfig !== 'function') return;
+    // 2. Fungsi yang menekan tombol "Tarik dari Cloud" secara otomatis untuk Anda
+    async function triggerNativeCloudPull() {
+      const now = Date.now();
+      if (now - lastAutoPullTime < 4000) return; // Jeda aman 4 detik agar tidak terpanggil beruntun
 
-      const cfg = getSyncConfig();
-      if (!cfg || !cfg.token || !cfg.gistId) return;
+      const lockEl = document.getElementById('lockScreen');
+      if (!lockEl || !lockEl.classList.contains('hidden')) return; // Jangan tarik jika layar PIN masih terkunci
 
-      isCheckingCloud = true;
+      forceEnableAutoCloud();
+
       try {
-        if (typeof setSyncIndicator === 'function') {
-          setSyncIndicator('Mengecek pembaruan Cloud...', 'bg-indigo-500');
+        // Isi dulu nilai Token & Gist ID ke dalam form modal (karena pullFromCloudGist membaca dari input tersebut)
+        if (typeof getSyncConfig === 'function') {
+          const cfg = getSyncConfig();
+          if (!cfg || !cfg.token || !cfg.gistId) return;
+
+          const tInput = document.getElementById('gistTokenInput') || document.getElementById('syncTokenInput');
+          const gInput = document.getElementById('gistIdInput') || document.getElementById('syncGistIdInput');
+          const aInput = document.getElementById('autoCloudSyncToggle');
+
+          if (tInput) tInput.value = cfg.token;
+          if (gInput) gInput.value = cfg.gistId;
+          if (aInput) aInput.checked = true;
         }
 
-        const res = await fetch(`https://api.github.com/gists/${cfg.gistId}?t=${Date.now()}`, {
-          headers: {
-            'Authorization': `token ${cfg.token}`,
-            'Accept': 'application/vnd.github+json'
-          },
-          cache: 'no-store'
-        });
-
-        if (!res.ok) throw new Error('Gagal menghubungi Cloud');
-        const data = await res.json();
-        const fileObj = data.files['vault.chronodoc'] || Object.values(data.files)[0];
-        if (!fileObj || !fileObj.content) return;
-
-        // Dekripsi data dari Cloud
-        const cloudVault = await decryptVaultPayload(fileObj.content, activePin);
-        const localTime = (typeof vaultData !== 'undefined' && vaultData.updatedAt) ? vaultData.updatedAt : 0;
-        const cloudTime = cloudVault.updatedAt || 0;
-
-        // Jika catatan di Cloud lebih baru daripada di perangkat ini, langsung perbarui!
-        if (cloudTime > localTime) {
-          vaultData = cloudVault;
-          await saveEncryptedVault(true); // Simpan lokal tanpa push balik
-          if (typeof renderAll === 'function') renderAll();
-          if (typeof showToast === 'function' && showNotification) {
-            showToast('☁️ Catatan terbaru otomatis dimuat dari Cloud!');
+        // Panggil langsung fungsi Tarik dari Cloud asli milik file 178 KB Anda!
+        if (typeof pullFromCloudGist === 'function') {
+          lastAutoPullTime = now;
+          await pullFromCloudGist();
+        } else {
+          // Cadangan jika nama fungsinya berbeda: langsung klik tombol "Tarik dari Cloud" secara virtual
+          const pullBtn = document.querySelector('button[onclick*="pullFromCloud"]');
+          if (pullBtn) {
+            lastAutoPullTime = now;
+            pullBtn.click();
           }
         }
-
-        if (typeof setSyncIndicator === 'function') {
-          setSyncIndicator('Tersinkronisasi dengan Cloud', 'bg-emerald-500');
-        }
-      } catch (err) {
-        console.warn('Auto-Pull dilewati:', err.message);
-      } finally {
-        isCheckingCloud = false;
+      } catch (e) {
+        console.warn('Auto-pull gagal:', e);
       }
     }
 
-    // 3. Kaitkan Auto-Pull tepat saat PIN 6 Angka berhasil dibuka
-    window.addEventListener('load', () => {
-      ensureAutoSyncEnabled();
-
-      if (typeof unlockVaultSuccess === 'function') {
-        const originalUnlock = unlockVaultSuccess;
-        unlockVaultSuccess = function() {
-          originalUnlock.apply(this, arguments);
-          setTimeout(() => smartAutoPullFromCloud(true), 300);
-        };
+    // 3. Pantau layar kunci PIN: Begitu layar PIN tertutup (terbuka kuncinya), langsung tarik dari Cloud!
+    window.addEventListener('DOMContentLoaded', () => {
+      forceEnableAutoCloud();
+      const lockEl = document.getElementById('lockScreen');
+      if (lockEl) {
+        const observer = new MutationObserver(() => {
+          if (lockEl.classList.contains('hidden')) {
+            setTimeout(triggerNativeCloudPull, 400);
+          }
+        });
+        observer.observe(lockEl, { attributes: true, attributeFilter: ['class'] });
       }
     });
 
-    // 4. Cek juga secara otomatis saat kembali membuka tab/layar HP (jika PIN sedang terbuka)
+    // 4. Tarik otomatis juga saat Anda berpindah kembali ke tab/aplikasi ChronoDocs
     window.addEventListener('focus', () => {
-      smartAutoPullFromCloud(true);
+      setTimeout(triggerNativeCloudPull, 300);
     });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        smartAutoPullFromCloud(true);
+        setTimeout(triggerNativeCloudPull, 300);
       }
     });
   })();
-</script></body>
+</script>
+</body>
 </html>
