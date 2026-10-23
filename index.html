@@ -1,0 +1,3237 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChronoDocs v2.0 Pro — Catatan Kronologis Terenkripsi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Rich Text Editor Typography & Block Styles */
+        .chrono-editor {
+            outline: none;
+            min-height: 280px;
+            line-height: 1.75;
+            font-size: 0.98rem;
+            color: inherit;
+            word-break: break-word;
+        }
+        .chrono-editor:empty:before {
+            content: attr(data-placeholder);
+            color: #94a3b8;
+            pointer-events: none;
+            display: block;
+        }
+        .chrono-editor .doc-title,
+        .chrono-editor h1.doc-title {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.025em;
+            margin-top: 0.15rem;
+            margin-bottom: 0.45rem;
+            color: inherit;
+        }
+        .chrono-editor .doc-subtitle,
+        .chrono-editor h2.doc-subtitle {
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.4;
+            color: #64748b;
+            margin-top: 0.1rem;
+            margin-bottom: 0.85rem;
+        }
+        .dark .chrono-editor .doc-subtitle {
+            color: #94a3b8;
+        }
+        .chrono-editor .doc-description,
+        .chrono-editor blockquote.doc-description {
+            font-size: 0.925rem;
+            font-style: italic;
+            background-color: rgba(99, 102, 241, 0.08);
+            border-left: 4px solid #6366f1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin: 0.75rem 0 1.15rem 0;
+            color: #334155;
+        }
+        .dark .chrono-editor .doc-description,
+        .dark .chrono-editor blockquote.doc-description {
+            background-color: rgba(99, 102, 241, 0.16);
+            color: #cbd5e1;
+        }
+        .chrono-editor blockquote:not(.doc-description) {
+            border-left: 3px solid #94a3b8;
+            padding-left: 1rem;
+            margin: 0.75rem 0;
+            color: #64748b;
+            font-style: italic;
+        }
+        .chrono-editor h1:not(.doc-title) {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.35;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        .chrono-editor h2:not(.doc-subtitle) {
+            font-size: 1.22rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-top: 1rem;
+            margin-bottom: 0.4rem;
+        }
+        .chrono-editor p, .chrono-editor div:not(.chrono-check-item) {
+            margin-bottom: 0.45rem;
+        }
+        .chrono-editor ul {
+            list-style-type: disc;
+            padding-left: 1.65rem;
+            margin: 0.5rem 0;
+        }
+        .chrono-editor ol {
+            list-style-type: decimal;
+            padding-left: 1.65rem;
+            margin: 0.5rem 0;
+        }
+        .chrono-editor li {
+            margin-bottom: 0.2rem;
+        }
+        .chrono-editor hr {
+            border: 0;
+            border-top: 2px dashed rgba(148, 163, 184, 0.35);
+            margin: 1.35rem 0;
+        }
+        .chrono-editor pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.84rem;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 0.85rem 1rem;
+            border-radius: 0.6rem;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+            border: 1px solid #334155;
+        }
+        /* Interactive Tables inside Editor */
+        .chrono-editor table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.85rem 0;
+            font-size: 0.9rem;
+        }
+        .chrono-editor th,
+        .chrono-editor td {
+            border: 1px solid #cbd5e1;
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        .dark .chrono-editor th,
+        .dark .chrono-editor td {
+            border-color: #334155;
+        }
+        .chrono-editor th {
+            background-color: rgba(99, 102, 241, 0.08);
+            font-weight: 600;
+        }
+        .dark .chrono-editor th {
+            background-color: rgba(99, 102, 241, 0.2);
+        }
+        /* Images inside Editor */
+        .chrono-editor img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.6rem;
+            margin: 0.75rem auto;
+            display: block;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .chrono-editor img:hover {
+            box-shadow: 0 0 0 3px #6366f1;
+        }
+        .chrono-editor img.img-w-25 { max-width: 25%; }
+        .chrono-editor img.img-w-50 { max-width: 50%; }
+        .chrono-editor img.img-w-75 { max-width: 75%; }
+        .chrono-editor img.img-w-100 { max-width: 100%; }
+
+        /* Interactive Checklist */
+        .chrono-check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.55rem;
+            margin: 0.3rem 0;
+        }
+        .chrono-check-item input[type="checkbox"] {
+            margin-top: 0.35rem;
+            width: 1.05rem;
+            height: 1.05rem;
+            accent-color: #4f46e5;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Card & Active States */
+        .sheet-card {
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .sheet-card.active-sheet {
+            border-color: #6366f1;
+            box-shadow: 0 12px 30px -8px rgba(79, 70, 229, 0.16);
+        }
+
+        /* PIN Dot Pulse */
+        .pin-dot {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .pin-dot.filled {
+            transform: scale(1.15);
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.65); }
+
+        /* Single Sheet & Full Print Styles */
+        #singleSheetPrintArea { display: none; }
+        @media print {
+            body.printing-single-sheet > *:not(#singleSheetPrintArea) {
+                display: none !important;
+            }
+            body.printing-single-sheet #singleSheetPrintArea {
+                display: block !important;
+                padding: 0.5in;
+                background: white !important;
+                color: black !important;
+            }
+            .no-print { display: none !important; }
+            body:not(.printing-single-sheet) .sheet-card {
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+                page-break-after: always;
+                margin-bottom: 1.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- ===================================================================== -->
+    <!-- 1. GLOBAL 6-DIGIT PIN LOCK & VAULT SETUP OVERLAY (AES-256-GCM)        -->
+    <!-- ===================================================================== -->
+    <div id="pinLockOverlay" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-4 no-print">
+        <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100 relative overflow-hidden">
+            <!-- Decorative Glow -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-brand-600/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Header -->
+            <div class="text-center mb-6 relative">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-700 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-brand-500/30">
+                    <i data-lucide="shield-lock" id="lockHeaderIcon" class="w-7 h-7 text-white"></i>
+                </div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-950 border border-brand-700/50 text-brand-300 text-[11px] font-semibold mb-2">
+                    <i data-lucide="lock" class="w-3 h-3"></i> AES-GCM 256-bit • Zero-Knowledge
+                </div>
+                <h1 id="lockTitle" class="text-xl font-bold text-white tracking-tight">Buka Vault ChronoDocs</h1>
+                <p id="lockSubtitle" class="text-xs text-slate-400 mt-1 leading-relaxed">
+                    Masukkan PIN 6 angka untuk mendekripsi seluruh catatan Anda secara lokal.
+                </p>
+            </div>
+
+            <!-- 6 PIN Dots Indicator -->
+            <div id="pinDotsContainer" class="flex items-center justify-center gap-3 my-6">
+                <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-600 bg-slate-800"></div>
+                <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-600 bg-slate-800"></div>
+                <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-600 bg-slate-800"></div>
+                <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-600 bg-slate-800"></div>
+                <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-600 bg-slate-800"></div>
+                <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-600 bg-slate-800"></div>
+            </div>
+
+            <!-- Error / Status Message -->
+            <div id="pinErrorMsg" class="min-h-[20px] text-center text-xs font-medium text-rose-400 mb-3"></div>
+
+            <!-- Numeric Keypad -->
+            <div class="grid grid-cols-3 gap-2.5 max-w-[280px] mx-auto mb-5">
+                <button type="button" data-pin-digit="1" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">1</button>
+                <button type="button" data-pin-digit="2" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">2</button>
+                <button type="button" data-pin-digit="3" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">3</button>
+                <button type="button" data-pin-digit="4" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">4</button>
+                <button type="button" data-pin-digit="5" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">5</button>
+                <button type="button" data-pin-digit="6" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">6</button>
+                <button type="button" data-pin-digit="7" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">7</button>
+                <button type="button" data-pin-digit="8" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">8</button>
+                <button type="button" data-pin-digit="9" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">9</button>
+                <button type="button" id="btnPinClear" class="h-12 rounded-2xl bg-slate-800/50 hover:bg-slate-800 active:scale-95 text-xs font-semibold text-slate-400 hover:text-white border border-slate-800 transition cursor-pointer">Hapus</button>
+                <button type="button" data-pin-digit="0" class="pin-key h-12 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-lg font-bold text-white border border-slate-700/70 transition cursor-pointer">0</button>
+                <button type="button" id="btnPinBackspace" class="h-12 rounded-2xl bg-slate-800/50 hover:bg-slate-800 active:scale-95 flex items-center justify-center text-slate-300 hover:text-white border border-slate-800 transition cursor-pointer" title="Backspace">
+                    <i data-lucide="delete" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Lock Screen Footer Options: Pull from Cloud / Import Vault / Reset -->
+            <div class="pt-4 border-t border-slate-800/90 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+                <button type="button" id="btnLockScreenCloudPull" class="hover:text-brand-400 flex items-center gap-1 transition cursor-pointer">
+                    <i data-lucide="cloud-download" class="w-3.5 h-3.5"></i> Pulihkan dari Cloud
+                </button>
+                <label class="hover:text-emerald-400 flex items-center gap-1 transition cursor-pointer">
+                    <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> Buka File .chronodoc
+                    <input id="inputLockScreenVaultFile" type="file" accept=".chronodoc,.json" class="hidden" />
+                </label>
+                <button type="button" id="btnResetVaultEmergency" class="hover:text-rose-400 flex items-center gap-1 transition cursor-pointer">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Vault
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 2. TOP HEADER & RICH TEXT FORMATTING TOOLBAR (STICKY)                 -->
+    <!-- ===================================================================== -->
+    <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 no-print">
+        <div class="max-w-[1800px] mx-auto px-3 sm:px-5 h-14 flex items-center justify-between gap-2">
+            
+            <!-- Left: Sidebar Toggle, Brand & Sync Status -->
+            <div class="flex items-center gap-2">
+                <button id="btnToggleLeftSidebar" title="Buka/Tutup Daftar Topik" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer">
+                    <i data-lucide="panel-left" class="w-5 h-5"></i>
+                </button>
+
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-700 flex items-center justify-center text-white shadow-sm shrink-0">
+                        <i data-lucide="layers" class="w-4 h-4"></i>
+                    </div>
+                    <div class="leading-tight">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white">ChronoDocs</span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-300">v2.0 PRO</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+                            <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span id="syncText" class="truncate max-w-[140px] sm:max-w-[240px]">Vault Terenkripsi Aktif</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center: Instant Search with Scope Toggle (Current Topic vs All Topics) -->
+            <div class="flex-1 max-w-lg mx-1 sm:mx-3">
+                <div class="relative flex items-center">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none"></i>
+                    <input
+                        id="searchInput"
+                        type="text"
+                        placeholder="Cari teks, #tag, atau tanggal... (Ctrl+F)"
+                        class="w-full pl-9 pr-28 py-1.5 text-xs sm:text-sm rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 transition"
+                    />
+                    <div class="absolute right-1.5 flex items-center gap-1">
+                        <button
+                            type="button"
+                            id="btnSearchScope"
+                            class="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-brand-100 dark:hover:bg-brand-900/50 transition cursor-pointer"
+                            title="Ganti Cakupan Pencarian: Topik Ini vs Semua Topik"
+                        >
+                            Topik Ini
+                        </button>
+                        <button id="btnClearSearch" class="hidden p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer" title="Bersihkan Pencarian">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: + Lembar Baru, Cloud Sync, Security/PIN, Panic Lock, Zen Mode & Theme -->
+            <div class="flex items-center gap-1 sm:gap-1.5">
+                <!-- Primary Action: New Sheet at Top -->
+                <button
+                    id="btnNewSheetTop"
+                    class="flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-semibold text-xs shadow-sm shadow-brand-500/20 transition cursor-pointer"
+                    title="Tambah Lembar Baru di Halaman 1 Paling Atas (Alt+N)"
+                >
+                    <i data-lucide="file-plus-2" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">+ Lembar Baru</span>
+                </button>
+
+                <!-- Zero-Knowledge Cloud & Local File Sync Modal Trigger -->
+                <button
+                    id="btnOpenCloudModal"
+                    class="flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition cursor-pointer"
+                    title="Sinkronisasi Zero-Knowledge Cloud & File Lokal (.chronodoc)"
+                >
+                    <i data-lucide="cloud-cog" class="w-4 h-4 text-brand-500"></i>
+                    <span class="hidden xl:inline">Sync</span>
+                </button>
+
+                <!-- Security Settings & Ciphertext Inspector -->
+                <button
+                    id="btnOpenSecurityModal"
+                    class="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition cursor-pointer"
+                    title="Pengaturan Keamanan PIN, Auto-Lock & Inspeksi Enkripsi"
+                >
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+                    <span id="autoLockCountdownBadge" class="hidden sm:inline font-mono text-[11px]">5m</span>
+                </button>
+
+                <!-- PANIC LOCK BUTTON (Esc 2x) -->
+                <button
+                    id="btnPanicLock"
+                    class="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 border border-rose-500/20 text-xs font-bold transition cursor-pointer"
+                    title="Kunci Cepat / Tombol Panik (Tekan Esc 2x cepat)"
+                >
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                    <span class="hidden lg:inline">Kunci</span>
+                </button>
+
+                <!-- Zen / Focus Mode -->
+                <button
+                    id="btnZenMode"
+                    class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                    title="Mode Fokus / Zen Mode (Alt+Z)"
+                >
+                    <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Dark Mode Toggle -->
+                <button
+                    id="btnThemeToggle"
+                    class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                    title="Ganti Tema Terang / Gelap"
+                >
+                    <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+                </button>
+
+                <!-- Right Timeline Toggle -->
+                <button
+                    id="btnToggleRightTimeline"
+                    class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                    title="Buka/Tutup Garis Waktu (Timeline Jumper)"
+                >
+                    <i data-lucide="panel-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- RICH TEXT EDITOR FORMATTING TOOLBAR -->
+        <div class="bg-slate-50/95 dark:bg-slate-900/95 border-t border-slate-200/80 dark:border-slate-800 px-2 sm:px-5 py-1.5 overflow-x-auto">
+            <div class="max-w-[1800px] mx-auto flex items-center gap-1 min-w-max">
+                <!-- Undo / Redo -->
+                <button type="button" data-cmd="undo" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer" title="Urungkan (Ctrl+Z)">
+                    <i data-lucide="undo-2" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="redo" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer" title="Ulangi (Ctrl+Y)">
+                    <i data-lucide="redo-2" class="w-4 h-4"></i>
+                </button>
+
+                <div class="h-5 w-px bg-slate-300 dark:bg-slate-700 mx-0.5"></div>
+
+                <!-- Block Style Buttons: Title, Subtitle, Description, H1, H2, Normal, Quote, Code -->
+                <div class="flex items-center bg-white dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
+                    <button type="button" data-block="title" class="block-style-btn px-2 py-1 rounded-md text-xs font-extrabold hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition cursor-pointer" title="Judul Utama (Title)">Title</button>
+                    <button type="button" data-block="subtitle" class="block-style-btn px-2 py-1 rounded-md text-xs font-medium hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 transition cursor-pointer" title="Subjudul (Subtitle)">Subtitle</button>
+                    <button type="button" data-block="description" class="block-style-btn px-2 py-1 rounded-md text-xs italic hover:bg-brand-50 dark:hover:bg-slate-700 text-brand-600 dark:text-brand-300 transition cursor-pointer" title="Blok Deskripsi / Ringkasan">Description</button>
+                    <button type="button" data-block="h1" class="block-style-btn px-2 py-1 rounded-md text-xs font-bold hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition cursor-pointer" title="Heading 1">H1</button>
+                    <button type="button" data-block="h2" class="block-style-btn px-2 py-1 rounded-md text-xs font-semibold hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition cursor-pointer" title="Heading 2">H2</button>
+                    <button type="button" data-block="normal" class="block-style-btn px-2 py-1 rounded-md text-xs hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer" title="Paragraf Normal">Normal</button>
+                    <button type="button" data-block="quote" class="block-style-btn px-2 py-1 rounded-md text-xs hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Kutipan (Quote)">Quote</button>
+                    <button type="button" data-block="code" class="block-style-btn px-2 py-1 rounded-md text-xs font-mono hover:bg-brand-50 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 transition cursor-pointer" title="Blok Kode (Code Block)">Code</button>
+                </div>
+
+                <div class="h-5 w-px bg-slate-300 dark:bg-slate-700 mx-0.5"></div>
+
+                <!-- Inline Styles -->
+                <button type="button" data-cmd="bold" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Bold (Ctrl+B)">
+                    <i data-lucide="bold" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="italic" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Italic (Ctrl+I)">
+                    <i data-lucide="italic" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="underline" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Underline (Ctrl+U)">
+                    <i data-lucide="underline" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="strikeThrough" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Strikethrough (Coret)">
+                    <i data-lucide="strikethrough" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="subscript" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Subscript (X₂)">
+                    <i data-lucide="subscript" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="superscript" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Superscript (X²)">
+                    <i data-lucide="superscript" class="w-4 h-4"></i>
+                </button>
+
+                <div class="h-5 w-px bg-slate-300 dark:bg-slate-700 mx-0.5"></div>
+
+                <!-- 12 Color Highlight Trigger -->
+                <button
+                    type="button"
+                    id="btnHighlightPicker"
+                    class="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer"
+                    title="Stabilo / Highlight Teks (12 Warna)"
+                >
+                    <i data-lucide="highlighter" class="w-4 h-4 text-amber-500"></i>
+                    <span id="currentHighlightBar" class="w-3.5 h-3.5 rounded-full bg-yellow-300 border border-slate-400/50"></span>
+                    <i data-lucide="chevron-down" class="w-3 h-3 opacity-60"></i>
+                </button>
+
+                <div class="h-5 w-px bg-slate-300 dark:bg-slate-700 mx-0.5"></div>
+
+                <!-- Lists & Checklists -->
+                <button type="button" data-cmd="insertUnorderedList" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Bullet List">
+                    <i data-lucide="list" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="insertOrderedList" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Numbered List">
+                    <i data-lucide="list-ordered" class="w-4 h-4"></i>
+                </button>
+                <button type="button" id="btnInsertChecklist" class="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Sisipkan Checklist Interaktif">
+                    <i data-lucide="list-checks" class="w-4 h-4"></i>
+                </button>
+
+                <div class="h-5 w-px bg-slate-300 dark:bg-slate-700 mx-0.5"></div>
+
+                <!-- Table Generator, Image, Divider, Timestamp, Clear Format -->
+                <button type="button" id="btnOpenTableModal" class="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium cursor-pointer" title="Sisipkan Tabel">
+                    <i data-lucide="table" class="w-4 h-4 text-indigo-500"></i>
+                    <span class="hidden xl:inline">Tabel</span>
+                </button>
+
+                <button type="button" id="btnOpenImageModal" class="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium cursor-pointer" title="Sisipkan Gambar (Auto-Compress / URL)">
+                    <i data-lucide="image-plus" class="w-4 h-4 text-brand-500"></i>
+                    <span class="hidden xl:inline">Gambar</span>
+                </button>
+
+                <button type="button" id="btnInsertDivider" class="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Sisipkan Garis Pembatas">
+                    <i data-lucide="minus" class="w-4 h-4"></i>
+                </button>
+
+                <button type="button" id="btnInsertNowStamp" class="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium cursor-pointer" title="Sisipkan Cap Waktu Sekarang">
+                    <i data-lucide="calendar-clock" class="w-4 h-4 text-emerald-500"></i>
+                    <span class="hidden 2xl:inline">+ Waktu</span>
+                </button>
+
+                <button type="button" data-cmd="removeFormat" class="fmt-btn p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-pointer" title="Bersihkan Format">
+                    <i data-lucide="remove-formatting" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- FLOATING 12-COLOR HIGHLIGHT POPOVER -->
+    <div id="highlightPopover" class="hidden fixed z-50 w-64 p-3 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 no-print">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-700 dark:text-slate-200">12 Warna Stabilo</span>
+            <button id="btnClearHighlight" class="text-[11px] text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1 cursor-pointer">
+                <i data-lucide="eraser" class="w-3 h-3"></i> Tanpa Stabilo
+            </button>
+        </div>
+        <div id="highlightGrid" class="grid grid-cols-4 gap-2"></div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 3. MAIN 3-COLUMN WORKSPACE: TOPICS (LEFT) + SHEETS (CENTER) + TIMELINE -->
+    <!-- ===================================================================== -->
+    <div class="flex-1 max-w-[1800px] w-full mx-auto flex relative">
+
+        <!-- LEFT SIDEBAR: MULTI-TOPIC / WORKSPACE MANAGER & TAG FILTERS -->
+        <aside id="leftSidebar" class="w-72 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white/75 dark:bg-slate-900/75 backdrop-blur-xs flex flex-col justify-between no-print transition-all duration-200 max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-30 max-lg:bg-white max-lg:dark:bg-slate-900 max-lg:shadow-2xl max-lg:-translate-x-full">
+            <div class="p-3.5 overflow-y-auto flex-1 space-y-5">
+                
+                <!-- Section 1: Topics / Notebooks List -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Topik / Buku Catatan</span>
+                        <button
+                            id="btnOpenNewTopicModal"
+                            class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-brand-50 dark:bg-brand-950/80 hover:bg-brand-100 dark:hover:bg-brand-900 text-brand-600 dark:text-brand-300 text-[11px] font-semibold transition cursor-pointer"
+                        >
+                            <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i> + Topik
+                        </button>
+                    </div>
+                    <div id="topicsListContainer" class="space-y-1">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Section 2: Active Topic Hashtag Filter Pills -->
+                <div id="tagFilterSection" class="hidden pt-3 border-t border-slate-200/70 dark:border-slate-800">
+                    <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+                        <span>Filter Label (#Tag)</span>
+                        <button id="btnClearTagFilter" class="text-brand-600 dark:text-brand-400 hidden hover:underline text-[11px] capitalize cursor-pointer">Reset</button>
+                    </div>
+                    <div id="tagPillsContainer" class="flex flex-wrap gap-1.5"></div>
+                </div>
+
+                <!-- Section 3: Local Vault File Direct Connection Status -->
+                <div class="p-3 rounded-2xl bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 text-xs space-y-2">
+                    <div class="flex items-center justify-between font-semibold text-slate-700 dark:text-slate-200">
+                        <span class="flex items-center gap-1.5"><i data-lucide="hard-drive" class="w-3.5 h-3.5 text-brand-500"></i> File Vault Lokal</span>
+                        <span id="localFileStatusBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Browser</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Hubungkan ke file <code class="font-mono">.chronodoc</code> di Google Drive/PC agar tersimpan langsung setiap mengedit.
+                    </p>
+                    <div class="flex gap-1.5 pt-1">
+                        <button id="btnConnectLocalFile" class="flex-1 py-1.5 px-2 rounded-lg bg-white dark:bg-slate-900 hover:bg-brand-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-brand-600 dark:text-brand-300 transition cursor-pointer">
+                            Hubungkan File
+                        </button>
+                        <button id="btnQuickExportVault" class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[11px] font-medium text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Unduh Backup .chronodoc">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Sidebar Footer -->
+            <div class="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                <span id="globalStatsText">0 Topik • 0 Lembar</span>
+                <span class="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <i data-lucide="shield" class="w-3 h-3"></i> AES-256
+                </span>
+            </div>
+        </aside>
+
+        <!-- CENTER WORKSPACE: REVERSE-CHRONOLOGICAL SHEETS STACK -->
+        <main class="flex-1 py-5 px-3 sm:px-6 lg:px-8 overflow-y-auto min-w-0">
+            <div class="max-w-4xl mx-auto">
+
+                <!-- Topic Header Banner & Fold/Sort Controls -->
+                <div class="mb-5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs no-print">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <!-- Active Topic Info -->
+                        <div class="flex items-center gap-3">
+                            <div id="activeTopicIconBox" class="w-10 h-10 rounded-2xl bg-brand-50 dark:bg-brand-950 text-xl flex items-center justify-center border border-brand-200 dark:border-brand-800">
+                                📘
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 id="activeTopicTitle" class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">Memuat Topik...</h2>
+                                    <button id="btnEditActiveTopic" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer" title="Ubah Nama / Ikon Topik">
+                                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <p id="activeTopicMeta" class="text-xs text-slate-500 dark:text-slate-400">
+                                    Lembar terbaru selalu berada di Halaman 1 (Paling Atas)
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Fold / Collapse & Sort Controls -->
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <button
+                                id="btnFoldOldSheets"
+                                class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-brand-50 dark:bg-brand-950/60 hover:bg-brand-100 dark:hover:bg-brand-900/80 text-brand-700 dark:text-brand-300 text-xs font-semibold border border-brand-200/70 dark:border-brand-800/60 transition cursor-pointer"
+                                title="Lipat semua lembar lama (Halaman 2 ke bawah) agar hanya Halaman 1 yang terbuka penuh"
+                            >
+                                <i data-lucide="fold-vertical" class="w-3.5 h-3.5"></i>
+                                <span>Lipat Lembar Lama (Hal 2+)</span>
+                            </button>
+
+                            <button
+                                id="btnUnfoldAllSheets"
+                                class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-medium transition cursor-pointer"
+                                title="Buka Semua Lembar"
+                            >
+                                Buka Semua
+                            </button>
+
+                            <button
+                                id="btnFoldAllSheets"
+                                class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-medium transition cursor-pointer"
+                                title="Lipat Semua Lembar Menjadi Baris Ringkas"
+                            >
+                                Lipat Semua
+                            </button>
+
+                            <button
+                                id="btnToggleSort"
+                                class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition cursor-pointer"
+                                title="Ubah Urutan Halaman"
+                            >
+                                <i data-lucide="arrow-down-wide-narrow" class="w-3.5 h-3.5 text-brand-500"></i>
+                                <span id="sortModeLabel">Terbaru di Atas</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SHEETS STACK CONTAINER -->
+                <div id="sheetsContainer" class="space-y-6 pb-24">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyStateContainer" class="hidden text-center py-16 px-4 rounded-2xl bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-800">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-950/80 text-brand-600 dark:text-brand-400 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="file-search" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">Tidak Ada Lembar yang Cocok</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-4">
+                        Tidak ditemukan lembar catatan untuk filter/pencarian ini, atau topik ini masih kosong.
+                    </p>
+                    <div class="flex items-center justify-center gap-2">
+                        <button id="btnResetFilterEmpty" class="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-300 transition cursor-pointer">
+                            Reset Pencarian
+                        </button>
+                        <button id="btnNewSheetFromEmpty" class="px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 transition cursor-pointer">
+                            + Buat Lembar Pertama
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- RIGHT SIDEBAR: FLOATING TIMELINE JUMPER -->
+        <aside id="rightTimelineSidebar" class="w-64 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xs flex flex-col justify-between no-print transition-all duration-200 max-xl:fixed max-xl:inset-y-0 max-xl:right-0 max-xl:z-30 max-xl:bg-white max-xl:dark:bg-slate-900 max-xl:shadow-2xl max-xl:translate-x-full">
+            <div class="p-3.5 overflow-y-auto flex-1">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+                        <i data-lucide="git-commit-vertical" class="w-3.5 h-3.5 text-brand-500"></i>
+                        Timeline Halaman
+                    </span>
+                    <span id="timelineCountBadge" class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-300">0 Hal</span>
+                </div>
+
+                <!-- Vertical Timeline Jumper List -->
+                <div id="timelineJumperList" class="relative pl-3 border-l-2 border-slate-200 dark:border-slate-800 space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="p-3 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                <span>Klik untuk lompat & buka</span>
+                <button id="btnScrollToTop" class="text-brand-600 dark:text-brand-400 font-semibold hover:underline flex items-center gap-0.5 cursor-pointer">
+                    <i data-lucide="arrow-up" class="w-3 h-3"></i> Ke Atas
+                </button>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- DEDICATED SINGLE-SHEET PRINT AREA (Only visible during Single Sheet Print) -->
+    <div id="singleSheetPrintArea"></div>
+
+    <!-- ===================================================================== -->
+    <!-- 4. MODAL: ZERO-KNOWLEDGE CLOUD SYNC (GITHUB GIST) & LOCAL VAULT FILE  -->
+    <!-- ===================================================================== -->
+    <div id="cloudSyncModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400 flex items-center justify-center">
+                        <i data-lucide="cloud-cog" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-slate-900 dark:text-white">Sinkronisasi Zero-Knowledge Cloud & Perangkat</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Data dienkripsi AES-256 dengan PIN 6 angka sebelum meninggalkan perangkat Anda</p>
+                    </div>
+                </div>
+                <button id="btnCloseCloudModal" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Cloud Relay Configuration (GitHub Secret Gist) -->
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 space-y-3 mb-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                        <i data-lucide="Lock" class="w-3.5 h-3.5 text-emerald-500"></i>
+                        Jalur 1: Zero-Knowledge Cloud Relay (GitHub Secret Gist)
+                    </span>
+                    <label class="inline-flex items-center gap-1.5 text-xs cursor-pointer">
+                        <input type="checkbox" id="chkAutoCloudSync" class="rounded accent-brand-600" />
+                        <span class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Auto-Sync saat mengedit</span>
+                    </label>
+                </div>
+
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Gunakan <strong>GitHub Personal Access Token</strong> (cukup centang izin <code class="font-mono bg-slate-200 dark:bg-slate-700 px-1 rounded">gist</code>). Isi catatan Anda disimpan sebagai <em>ciphertext</em> terenkripsi di Gist rahasia pribadi Anda.
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">GitHub Token (Scope: gist)</label>
+                        <input
+                            id="inputGithubToken"
+                            type="password"
+                            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                            class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-brand-500 font-mono"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">ID Gist Vault (Kosongkan jika baru)</label>
+                        <input
+                            id="inputGistId"
+                            type="text"
+                            placeholder="Otomatis dibuat jika kosong"
+                            class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-brand-500 font-mono"
+                        />
+                    </div>
+                </div>
+
+                <!-- One-Paste Multi-Device Sync Code -->
+                <div class="pt-2 border-t border-slate-200/70 dark:border-slate-700/60">
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300">Kode Pairing Perangkat Baru (HP / Tablet / PC Rumah Belajar)</label>
+                        <button type="button" id="btnCopyPairingCode" class="text-[11px] text-brand-600 dark:text-brand-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer">
+                            <i data-lucide="copy" class="w-3 h-3"></i> Salin Kode Pairing
+                        </button>
+                    </div>
+                    <div class="flex gap-2">
+                        <input
+                            id="inputPairingCode"
+                            type="text"
+                            placeholder="Tempel Kode Pairing di sini untuk menghubungkan perangkat baru dalam 1 klik..."
+                            class="flex-1 px-3 py-1.5 text-[11px] rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono"
+                        />
+                        <button type="button" id="btnApplyPairingCode" class="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-xs font-semibold cursor-pointer">
+                            Terapkan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons for Cloud Sync -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+                    <span id="cloudLastSyncInfo" class="text-[11px] text-slate-500 dark:text-slate-400">Belum disinkronkan</span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" id="btnCloudPullNow" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                            <i data-lucide="cloud-download" class="w-4 h-4 text-brand-500"></i>
+                            Tarik dari Cloud
+                        </button>
+                        <button type="button" id="btnCloudPushNow" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm cursor-pointer">
+                            <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+                            Simpan & Kirim ke Cloud
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jalur 2: Local Encrypted File / Google Drive Folder -->
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 space-y-2.5">
+                <div class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                    <i data-lucide="folder-sync" class="w-3.5 h-3.5 text-indigo-500"></i>
+                    Jalur 2: File Vault Terenkripsi (.chronodoc) untuk Google Drive / Flashdisk
+                </div>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                    Anda juga dapat mengekspor atau mengimpor seluruh topik & lembar catatan dalam satu file <code class="font-mono">.chronodoc</code> yang tetap terkunci dengan PIN 6 angka Anda.
+                </p>
+                <div class="flex flex-wrap gap-2 pt-1">
+                    <button type="button" id="btnExportEncryptedVault" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="download" class="w-4 h-4"></i> Ekspor Vault (.chronodoc)
+                    </button>
+                    <label class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Impor Vault (.chronodoc)
+                        <input id="inputImportEncryptedVault" type="file" accept=".chronodoc,.json" class="hidden" />
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 5. MODAL: SECURITY SETTINGS, AUTO-LOCK, CHANGE PIN & CIPHERTEXT       -->
+    <!-- ===================================================================== -->
+    <div id="securityModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
+                    Keamanan Vault, Auto-Lock & Enkripsi
+                </h3>
+                <button id="btnCloseSecurityModal" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Auto-Lock Idle Timer Selector -->
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 mb-4">
+                <label class="block text-xs font-bold text-slate-800 dark:text-slate-100 mb-1">Timer Kunci Otomatis (Auto-Lock saat Idle)</label>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2.5">
+                    Jika perangkat tidak disentuh selama batas waktu ini, ChronoDocs otomatis mengunci layar dan membersihkan memori.
+                </p>
+                <select id="selectAutoLockMinutes" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-semibold">
+                    <option value="1">1 Menit (Sangat Ketat)</option>
+                    <option value="5" selected>5 Menit (Direkomendasikan)</option>
+                    <option value="15">15 Menit</option>
+                    <option value="30">30 Menit</option>
+                    <option value="0">Nonaktif (Hanya Kunci Manual / Esc 2x)</option>
+                </select>
+                <div class="mt-2.5 flex items-center gap-2 text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                    <span>Tips Tombol Panik: Tekan tombol <strong>Esc 2x dengan cepat</strong> kapan saja untuk langsung mengunci layar seketika!</span>
+                </div>
+            </div>
+
+            <!-- Change 6-Digit PIN -->
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 mb-4">
+                <div class="text-xs font-bold text-slate-800 dark:text-slate-100 mb-2">Ganti PIN Keamanan 6 Angka</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-2.5">
+                    <input id="inputNewPin" type="password" inputmode="numeric" maxlength="6" placeholder="PIN Baru (6 angka)" class="px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono tracking-widest" />
+                    <input id="inputConfirmNewPin" type="password" inputmode="numeric" maxlength="6" placeholder="Konfirmasi PIN Baru" class="px-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-mono tracking-widest" />
+                </div>
+                <button type="button" id="btnSaveNewPin" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold cursor-pointer">
+                    Enkripsi Ulang dengan PIN Baru
+                </button>
+            </div>
+
+            <!-- Live Ciphertext Proof Inspector -->
+            <div class="p-4 rounded-2xl bg-slate-900 text-slate-200 border border-slate-800">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                        <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Bukti Enkripsi Zero-Knowledge (Ciphertext)
+                    </span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">PBKDF2 + AES-GCM-256</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mb-2">
+                    Inilah wujud asli data Anda yang disimpan di penyimpanan browser & dikirim ke Cloud. Tanpa PIN 6 angka Anda, data ini mustahil dibaca:
+                </p>
+                <pre id="ciphertextPreviewBox" class="text-[10px] font-mono bg-slate-950 text-emerald-300/90 p-2.5 rounded-xl overflow-x-auto max-h-32 whitespace-pre-wrap break-all"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 6. MODAL: CREATE / EDIT TOPIC                                         -->
+    <!-- ===================================================================== -->
+    <div id="topicModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+            <div class="flex items-center justify-between mb-3">
+                <h3 id="topicModalHeading" class="font-bold text-base text-slate-900 dark:text-white">Buat Topik Catatan Baru</h3>
+                <button id="btnCloseTopicModal" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-3 mb-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nama Topik / Buku Catatan</label>
+                    <input id="inputTopicName" type="text" placeholder="Misal: Rumah Belajar, Proyek, Keuangan" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-brand-500" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Pilih Ikon Topik</label>
+                    <div id="topicIconPicker" class="grid grid-cols-6 gap-1.5">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="button" id="btnDeleteTopicInModal" class="hidden px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 cursor-pointer">
+                    Hapus Topik
+                </button>
+                <div class="flex gap-2 ml-auto">
+                    <button type="button" id="btnCancelTopicModal" class="px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Batal</button>
+                    <button type="button" id="btnSaveTopicModal" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white cursor-pointer">Simpan Topik</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 7. MODAL: TABLE GENERATOR                                             -->
+    <!-- ===================================================================== -->
+    <div id="tableModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                    <i data-lucide="table" class="w-5 h-5 text-indigo-500"></i>
+                    Sisipkan Tabel ke Lembar
+                </h3>
+                <button id="btnCloseTableModal" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Jumlah Baris</label>
+                    <input id="inputTableRows" type="number" min="2" max="30" value="4" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Jumlah Kolom</label>
+                    <input id="inputTableCols" type="number" min="1" max="10" value="3" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" />
+                </div>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button id="btnCancelTableModal" class="px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 cursor-pointer">Batal</button>
+                <button id="btnConfirmInsertTable" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white cursor-pointer">Sisipkan Tabel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 8. MODAL: ADD IMAGE (AUTO-COMPRESSED UPLOAD OR URL)                   -->
+    <!-- ===================================================================== -->
+    <div id="imageModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                    <i data-lucide="image-plus" class="w-5 h-5 text-brand-500"></i>
+                    Sisipkan Gambar ke Lembar
+                </h3>
+                <button id="btnCloseImageModal" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">1. Pilih Gambar dari Perangkat (Otomatis Dikompresi)</label>
+                <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-brand-500 rounded-xl p-5 cursor-pointer bg-slate-50 dark:bg-slate-800/50 transition">
+                    <i data-lucide="upload-cloud" class="w-7 h-7 text-brand-500 mb-1"></i>
+                    <span class="text-xs font-medium text-slate-700 dark:text-slate-200">Klik untuk pilih file gambar</span>
+                    <span class="text-[11px] text-slate-400 mt-0.5">Ringan untuk sinkronisasi Cloud & terenkripsi bersama catatan</span>
+                    <input id="inputImageFile" type="file" accept="image/*" class="hidden" />
+                </label>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">2. Atau Tempel URL Gambar</label>
+                <input id="inputImageUrl" type="url" placeholder="https://contoh.com/gambar.jpg" class="w-full px-3 py-2 text-xs rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-brand-500" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <button id="btnCancelImageModal" class="px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 cursor-pointer">Batal</button>
+                <button id="btnConfirmImageUrl" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white cursor-pointer">Sisipkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 9. MODAL: SHEET EDIT HISTORY & DELETE CONFIRMATION                    -->
+    <!-- ===================================================================== -->
+    <div id="historyModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                    <i data-lucide="history" class="w-5 h-5 text-brand-500"></i>
+                    Log Waktu Pembuatan & Riwayat Edit
+                </h3>
+                <button id="btnCloseHistoryModal" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="historyModalMeta" class="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/70 p-3 rounded-xl mb-3 space-y-1"></div>
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Log Aktivitas Lembar</div>
+            <div id="historyLogList" class="max-h-60 overflow-y-auto space-y-2 pr-1 text-xs"></div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+            <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-3">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+            </div>
+            <h3 id="deleteModalTitle" class="font-bold text-base text-slate-900 dark:text-white mb-1">Hapus Lembar Ini?</h3>
+            <p id="deleteModalDesc" class="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed"></p>
+            <div class="flex justify-end gap-2">
+                <button id="btnCancelDelete" class="px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 cursor-pointer">Batal</button>
+                <button id="btnConfirmDelete" class="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white cursor-pointer">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastNotification" class="fixed bottom-4 right-4 z-[90] hidden items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-xl no-print">
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 dark:text-emerald-600"></i>
+        <span id="toastText">Tersimpan</span>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 10. APPLICATION ENGINE: WEB CRYPTO AES-256, CLOUD GIST & MULTI-TOPIC  -->
+    <!-- ===================================================================== -->
+    <script>
+        // ====================================================================
+        // A. CONSTANTS & STORAGE KEYS
+        // ====================================================================
+        const VAULT_STORAGE_KEY = 'chronodocs_v2_encrypted_vault';
+        const CLOUD_CONFIG_KEY  = 'chronodocs_v2_cloud_config';
+        const PREFS_STORAGE_KEY = 'chronodocs_v2_ui_prefs';
+
+        const HIGHLIGHT_COLORS = [
+            { name: 'Kuning', hex: '#fef08a' },
+            { name: 'Amber', hex: '#fde68a' },
+            { name: 'Oranye', hex: '#fed7aa' },
+            { name: 'Merah', hex: '#fecdd3' },
+            { name: 'Pink', hex: '#fbcfe8' },
+            { name: 'Ungu', hex: '#e9d5ff' },
+            { name: 'Indigo', hex: '#c7d2fe' },
+            { name: 'Biru', hex: '#bae6fd' },
+            { name: 'Sian', hex: '#a5f3fc' },
+            { name: 'Teal', hex: '#99f6e4' },
+            { name: 'Hijau', hex: '#bbf7d0' },
+            { name: 'Abu', hex: '#e2e8f0' }
+        ];
+
+        const TOPIC_ICONS = ['📘', '🏫', '💼', '🚀', '💡', '📊', '🧪', '🏠', '💰', '📝', '🎯', '🔒'];
+
+        // ====================================================================
+        // B. RUNTIME STATE (Sensitive data cleared immediately on Lock)
+        // ====================================================================
+        let currentSessionPin = null; // Held only in RAM while unlocked
+        let isVaultLocked = true;
+        let pinSetupStage = 'unlock'; // 'create' | 'confirm' | 'unlock'
+        let pinBuffer = '';
+        let firstPinEntered = '';
+
+        let vaultData = {
+            version: 2,
+            updatedAt: Date.now(),
+            activeTopicId: null,
+            topics: []
+        };
+
+        let activeSheetId = null;
+        let savedSelectionRange = null;
+        let sortDirection = 'newest'; // 'newest' | 'oldest'
+        let searchScope = 'topic';    // 'topic' | 'all'
+        let activeSearchQuery = '';
+        let activeTagFilter = null;
+        let editingTopicId = null;
+        let selectedTopicIcon = '📘';
+        let pendingDeleteAction = null;
+
+        // Auto-lock & Panic state
+        let autoLockMinutes = 5;
+        let lastActivityTime = Date.now();
+        let lastEscapePressTime = 0;
+
+        // File System Access API Handle & Cloud Debounce
+        let localFileHandle = null;
+        let saveVaultDebounceTimer = null;
+        let cloudSyncDebounceTimer = null;
+        const broadcastChannel = ('BroadcastChannel' in window) ? new BroadcastChannel('chronodocs_v2_sync') : null;
+
+        // ====================================================================
+        // C. INITIAL SAMPLE DATA (Multi-Topic + Reverse Chronological Sheets)
+        // ====================================================================
+        function createDefaultVaultData() {
+            const now = Date.now();
+            const yesterday = now - 86400000;
+            const lastWeek = now - 86400000 * 6;
+
+            return {
+                version: 2,
+                updatedAt: now,
+                activeTopicId: 'topic-rumah-belajar',
+                topics: [
+                    {
+                        id: 'topic-rumah-belajar',
+                        name: 'Rumah Belajar & Jadwal',
+                        icon: '🏫',
+                        createdAt: lastWeek,
+                        updatedAt: now,
+                        sheets: [
+                            {
+                                id: 'sheet-rb-2',
+                                createdAt: now,
+                                updatedAt: now,
+                                pinned: false,
+                                collapsed: false,
+                                tags: ['jadwal', 'terbaru', 'sinkronisasi'],
+                                editLog: [
+                                    { time: now, summary: 'Lembar terbaru dibuat di Halaman 1 (Paling Atas)' }
+                                ],
+                                content: `
+                                    <h1 class="doc-title">Evaluasi Mingguan &amp; Agenda Rumah Belajar</h1>
+                                    <h2 class="doc-subtitle">Lembar terbaru selalu berada di Halaman 1 (Paling Atas) — langsung terlihat begitu dibuka!</h2>
+                                    <blockquote class="doc-description">Deskripsi: Selamat datang di <b>ChronoDocs v2.0 Pro</b>. Seluruh topik dan lembar catatan Anda kini dikunci menggunakan enkripsi militer <b>AES-GCM 256-bit (PIN 6 Angka)</b> dan siap disinkronkan antar PC Rumah, Rumah Belajar, Tablet, dan HP.</blockquote>
+                                    <h1>1. Keunggulan Alur Kronologis Terbalik</h1>
+                                    <p>Catatan yang paling baru adalah yang <span style="background-color: #fef08a;">paling relevan dan sering diakses</span>. Setiap kali Anda menekan tombol <b>"+ Lembar Baru"</b> (atau <code style="font-family: monospace;">Alt + N</code>), lembar kosong muncul di atas ini, dan catatan lama otomatis turun menjadi Halaman 2, 3, dst.</p>
+                                    <h2>Checklist Operasional Hari Ini</h2>
+                                    <div class="chrono-check-item"><input type="checkbox" checked><span>Aktifkan PIN 6 Angka Global &amp; Auto-Lock 5 menit #terbaru</span></div>
+                                    <div class="chrono-check-item"><input type="checkbox"><span>Hubungkan Zero-Knowledge Cloud (GitHub Gist) di menu <b>Sync</b> atas #sinkronisasi</span></div>
+                                    <div class="chrono-check-item"><input type="checkbox"><span>Coba tekan tombol <b>Esc 2x cepat</b> untuk mengetes Tombol Panik #jadwal</span></div>
+                                    <h2>Tabel Ringkasan Sesi Belajar</h2>
+                                    <table>
+                                        <thead>
+                                            <tr><th>Hari / Sesi</th><th>Fokus Materi</th><th>Status</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>Senin &amp; Rabu</td><td>Pendalaman Konsep &amp; Latihan Soal</td><td><span style="background-color: #bbf7d0;">Berjalan Lancar</span></td></tr>
+                                            <tr><td>Jumat Sore</td><td>Evaluasi &amp; Diskusi Proyek</td><td><span style="background-color: #bae6fd;">Terjadwal</span></td></tr>
+                                        </tbody>
+                                    </table>
+                                `.trim()
+                            },
+                            {
+                                id: 'sheet-rb-1',
+                                createdAt: lastWeek,
+                                updatedAt: yesterday,
+                                pinned: false,
+                                collapsed: false,
+                                tags: ['arsip', 'panduan'],
+                                editLog: [
+                                    { time: lastWeek, summary: 'Catatan awal Rumah Belajar dibuat' },
+                                    { time: yesterday, summary: 'Menambahkan panduan lipat lembar lama' }
+                                ],
+                                content: `
+                                    <h1 class="doc-title">Catatan Kick-Off Awal (Minggu Lalu)</h1>
+                                    <h2 class="doc-subtitle">Otomatis menjadi Halaman 2 di bawah catatan terbaru</h2>
+                                    <blockquote class="doc-description">Deskripsi: Karena catatan ini dibuat lebih dulu, posisinya otomatis turun ke Halaman 2. Anda bisa menekan tombol <b>"Lipat Lembar Lama (Hal 2+)"</b> di atas agar lembar-lembar lama seperti ini terlipat rapi menjadi 1 baris judul saja.</blockquote>
+                                    <p>Gunakan panel <b>Timeline Halaman</b> di sebelah kanan layar untuk melompat cepat ke tanggal atau lembar mana pun dengan satu klik. #arsip #panduan</p>
+                                `.trim()
+                            }
+                        ]
+                    },
+                    {
+                        id: 'topic-proyek-ide',
+                        name: 'Proyek & Catatan Pribadi',
+                        icon: '🚀',
+                        createdAt: yesterday,
+                        updatedAt: yesterday,
+                        sheets: [
+                            {
+                                id: 'sheet-pr-1',
+                                createdAt: yesterday,
+                                updatedAt: yesterday,
+                                pinned: false,
+                                collapsed: false,
+                                tags: ['github', 'cloud'],
+                                editLog: [
+                                    { time: yesterday, summary: 'Membuat panduan GitHub Pages & Zero-Knowledge Cloud' }
+                                ],
+                                content: `
+                                    <h1 class="doc-title">Cara Pakai di Banyak Perangkat (PC, Tablet, HP)</h1>
+                                    <h2 class="doc-subtitle">100% Privat dengan Zero-Knowledge Cloud atau File .chronodoc</h2>
+                                    <blockquote class="doc-description">Deskripsi: Anda bisa mengunggah file HTML ini ke <b>GitHub Pages</b> agar bisa diakses dari HP/Tablet/PC mana saja, atau membukanya langsung dari komputer.</blockquote>
+                                    <ol>
+                                        <li>Klik tombol <b>Sync</b> di pojok kanan atas.</li>
+                                        <li>Masukkan <i>GitHub Personal Access Token</i> (cukup centang izin <code style="font-family: monospace;">gist</code>) lalu klik <b>Simpan &amp; Kirim ke Cloud</b>.</li>
+                                        <li>Salin <b>Kode Pairing Perangkat Baru</b> dan tempelkan di HP atau PC Rumah Belajar Anda.</li>
+                                    </ol>
+                                    <p>Seluruh data yang tersimpan di GitHub Gist berwujud sandi acak (<i>ciphertext</i>) yang hanya bisa dibuka dengan <b>PIN 6 Angka</b> Anda. #github #cloud</p>
+                                `.trim()
+                            }
+                        ]
+                    }
+                ]
+            };
+        }
+
+        // ====================================================================
+        // D. REAL CRYPTOGRAPHY ENGINE: PBKDF2 + AES-GCM 256-BIT (Web Crypto API)
+        // ====================================================================
+        function bufToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        function base64ToBuf(base64) {
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        async function deriveKeyFromPin(pin, saltUint8) {
+            const enc = new TextEncoder();
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                enc.encode(pin),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
+            return window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: saltUint8,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        async function encryptVaultPayload(plainObject, pin) {
+            const enc = new TextEncoder();
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            const iv   = window.crypto.getRandomValues(new Uint8Array(12));
+            const key  = await deriveKeyFromPin(pin, salt);
+
+            const jsonString = JSON.stringify(plainObject);
+            const cipherBuffer = await window.crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                enc.encode(jsonString)
+            );
+
+            return {
+                app: 'ChronoDocs-v2-ZeroKnowledgeVault',
+                cipher: 'AES-256-GCM-PBKDF2-100K',
+                updatedAt: plainObject.updatedAt || Date.now(),
+                salt: bufToBase64(salt.buffer),
+                iv: bufToBase64(iv.buffer),
+                ciphertext: bufToBase64(cipherBuffer)
+            };
+        }
+
+        async function decryptVaultPayload(envelope, pin) {
+            if (!envelope || !envelope.salt || !envelope.iv || !envelope.ciphertext) {
+                throw new Error('Format vault terenkripsi tidak valid');
+            }
+            const salt = new Uint8Array(base64ToBuf(envelope.salt));
+            const iv   = new Uint8Array(base64ToBuf(envelope.iv));
+            const cipherBuf = base64ToBuf(envelope.ciphertext);
+
+            const key = await deriveKeyFromPin(pin, salt);
+            const plainBuffer = await window.crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                cipherBuf
+            );
+
+            const dec = new TextDecoder();
+            return JSON.parse(dec.decode(plainBuffer));
+        }
+
+        // ====================================================================
+        // E. PIN LOCK SCREEN, AUTO-LOCK & PANIC BUTTON (ESC 2x)
+        // ====================================================================
+        function initLockScreenState() {
+            const rawStored = localStorage.getItem(VAULT_STORAGE_KEY);
+            const titleEl = document.getElementById('lockTitle');
+            const subEl = document.getElementById('lockSubtitle');
+            const errEl = document.getElementById('pinErrorMsg');
+
+            pinBuffer = '';
+            errEl.textContent = '';
+            updatePinDotsUI();
+
+            if (!rawStored) {
+                pinSetupStage = 'create';
+                titleEl.textContent = 'Buat PIN Keamanan 6 Angka';
+                subEl.textContent = 'PIN ini akan mengenkripsi seluruh catatan Anda dengan standar militer AES-256.';
+            } else {
+                pinSetupStage = 'unlock';
+                titleEl.textContent = 'Vault ChronoDocs Terkunci';
+                subEl.textContent = 'Masukkan PIN 6 angka Anda untuk membuka dan mendekripsi catatan.';
+            }
+            document.getElementById('pinLockOverlay').classList.remove('hidden');
+            isVaultLocked = true;
+        }
+
+        function updatePinDotsUI() {
+            const dots = document.querySelectorAll('#pinDotsContainer .pin-dot');
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('filled', idx < pinBuffer.length);
+            });
+        }
+
+        async function handlePinDigitInput(digit) {
+            if (pinBuffer.length >= 6) return;
+            pinBuffer += String(digit);
+            document.getElementById('pinErrorMsg').textContent = '';
+            updatePinDotsUI();
+
+            if (pinBuffer.length === 6) {
+                await processCompletedPin(pinBuffer);
+            }
+        }
+
+        async function processCompletedPin(enteredPin) {
+            const titleEl = document.getElementById('lockTitle');
+            const subEl   = document.getElementById('lockSubtitle');
+            const errEl   = document.getElementById('pinErrorMsg');
+
+            if (pinSetupStage === 'create') {
+                firstPinEntered = enteredPin;
+                pinBuffer = '';
+                pinSetupStage = 'confirm';
+                updatePinDotsUI();
+                titleEl.textContent = 'Konfirmasi PIN 6 Angka';
+                subEl.textContent = 'Masukkan kembali 6 angka PIN yang baru saja Anda buat.';
+                return;
+            }
+
+            if (pinSetupStage === 'confirm') {
+                if (enteredPin !== firstPinEntered) {
+                    pinBuffer = '';
+                    firstPinEntered = '';
+                    pinSetupStage = 'create';
+                    updatePinDotsUI();
+                    titleEl.textContent = 'Buat PIN Keamanan 6 Angka';
+                    errEl.textContent = 'PIN tidak cocok. Silakan buat ulang PIN 6 angka Anda.';
+                    return;
+                }
+                // Initialize brand-new encrypted vault
+                currentSessionPin = enteredPin;
+                vaultData = createDefaultVaultData();
+                await saveAndEncryptVault({ triggerCloud: false });
+                unlockWorkspaceUI();
+                showToast('Vault AES-256 berhasil dibuat & diamankan!');
+                return;
+            }
+
+            if (pinSetupStage === 'unlock') {
+                try {
+                    const rawStored = localStorage.getItem(VAULT_STORAGE_KEY);
+                    const envelope = JSON.parse(rawStored);
+                    const decrypted = await decryptVaultPayload(envelope, enteredPin);
+                    currentSessionPin = enteredPin;
+                    vaultData = decrypted;
+                    unlockWorkspaceUI();
+                } catch (e) {
+                    pinBuffer = '';
+                    updatePinDotsUI();
+                    errEl.textContent = 'PIN 6 angka salah! Gagal mendekripsi vault.';
+                }
+            }
+        }
+
+        function unlockWorkspaceUI() {
+            isVaultLocked = false;
+            pinBuffer = '';
+            updatePinDotsUI();
+            document.getElementById('pinLockOverlay').classList.add('hidden');
+
+            // Ensure valid activeTopicId and activeSheetId
+            if (!vaultData.topics || vaultData.topics.length === 0) {
+                vaultData = createDefaultVaultData();
+            }
+            const activeTopic = getActiveTopic();
+            if (activeTopic && activeTopic.sheets.length > 0) {
+                activeSheetId = getSortedSheetsForTopic(activeTopic)[0].id;
+            }
+            lastActivityTime = Date.now();
+            renderAll();
+            updateCiphertextInspector();
+        }
+
+        function lockVaultImmediately(reason = 'Vault dikunci') {
+            if (isVaultLocked) return;
+            isVaultLocked = true;
+            currentSessionPin = null;
+            pinBuffer = '';
+
+            // Wipe sensitive decrypted DOM immediately
+            document.getElementById('sheetsContainer').innerHTML = '';
+            document.getElementById('topicsListContainer').innerHTML = '';
+            document.getElementById('timelineJumperList').innerHTML = '';
+
+            initLockScreenState();
+            showToast(reason);
+        }
+
+        // ====================================================================
+        // F. SAVE & ENCRYPT VAULT (LocalStorage + File Handle + Cloud Gist)
+        // ====================================================================
+        async function saveAndEncryptVault(options = { triggerCloud: true }) {
+            if (!currentSessionPin || isVaultLocked) return;
+
+            setSyncStatus('syncing', 'Mengenkripsi & menyimpan...');
+            vaultData.updatedAt = Date.now();
+
+            try {
+                const envelope = await encryptVaultPayload(vaultData, currentSessionPin);
+                const serialized = JSON.stringify(envelope, null, 2);
+                localStorage.setItem(VAULT_STORAGE_KEY, serialized);
+                updateCiphertextInspector(envelope);
+
+                // Broadcast to other open tabs
+                if (broadcastChannel) {
+                    broadcastChannel.postMessage({ type: 'VAULT_ENCRYPTED_UPDATE', envelope });
+                }
+
+                // If connected to a local file (.chronodoc in Google Drive/PC), write directly
+                if (localFileHandle) {
+                    try {
+                        const writable = await localFileHandle.createWritable();
+                        await writable.write(serialized);
+                        await writable.close();
+                    } catch (fileErr) {
+                        console.warn('Gagal menulis otomatis ke file lokal:', fileErr);
+                    }
+                }
+
+                setSyncStatus('synced', 'Tersimpan & Terenkripsi (AES-256)');
+
+                // Trigger debounced Cloud Auto-Sync if enabled
+                const cloudCfg = loadCloudConfig();
+                if (options.triggerCloud && cloudCfg.autoSync && cloudCfg.token) {
+                    if (cloudSyncDebounceTimer) clearTimeout(cloudSyncDebounceTimer);
+                    cloudSyncDebounceTimer = setTimeout(() => {
+                        pushEncryptedVaultToCloud({ silent: true });
+                    }, 1800);
+                }
+            } catch (err) {
+                console.error('Encryption save error:', err);
+                setSyncStatus('error', 'Gagal mengenkripsi');
+            }
+        }
+
+        function scheduleVaultSave() {
+            if (saveVaultDebounceTimer) clearTimeout(saveVaultDebounceTimer);
+            saveVaultDebounceTimer = setTimeout(() => {
+                saveAndEncryptVault({ triggerCloud: true });
+            }, 350);
+        }
+
+        function setSyncStatus(state, text) {
+            const dot = document.getElementById('syncDot');
+            const label = document.getElementById('syncText');
+            if (!dot || !label) return;
+            label.textContent = text;
+            if (state === 'syncing') {
+                dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+            } else if (state === 'error') {
+                dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+            } else {
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+            }
+        }
+
+        function updateCiphertextInspector(envelopeObj = null) {
+            const box = document.getElementById('ciphertextPreviewBox');
+            if (!box) return;
+            const raw = envelopeObj ? JSON.stringify(envelopeObj, null, 2) : localStorage.getItem(VAULT_STORAGE_KEY);
+            box.textContent = raw ? raw.slice(0, 900) + '\n... [CIPHERTEXT TERKUNCI AES-256-GCM]' : 'Belum ada data.';
+        }
+
+        // ====================================================================
+        // G. ZERO-KNOWLEDGE CLOUD ENGINE (GitHub Secret Gist Relay)
+        // ====================================================================
+        function loadCloudConfig() {
+            try {
+                const raw = localStorage.getItem(CLOUD_CONFIG_KEY);
+                if (raw) return JSON.parse(raw);
+            } catch (e) {}
+            return { token: '', gistId: '', autoSync: false, lastSyncedAt: null };
+        }
+
+        function saveCloudConfig(cfg) {
+            localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cfg));
+            populateCloudModalFields();
+        }
+
+        function populateCloudModalFields() {
+            const cfg = loadCloudConfig();
+            document.getElementById('inputGithubToken').value = cfg.token || '';
+            document.getElementById('inputGistId').value = cfg.gistId || '';
+            document.getElementById('chkAutoCloudSync').checked = Boolean(cfg.autoSync);
+            const infoEl = document.getElementById('cloudLastSyncInfo');
+            if (cfg.lastSyncedAt) {
+                infoEl.textContent = `Sinkron terakhir: ${formatExactDate(cfg.lastSyncedAt)}`;
+            } else {
+                infoEl.textContent = 'Belum pernah disinkronkan ke Cloud';
+            }
+        }
+
+        async function pushEncryptedVaultToCloud(options = { silent: false }) {
+            const token = document.getElementById('inputGithubToken').value.trim();
+            let gistId  = document.getElementById('inputGistId').value.trim();
+            const autoSync = document.getElementById('chkAutoCloudSync').checked;
+
+            if (!token) {
+                if (!options.silent) showToast('Masukkan GitHub Personal Access Token terlebih dahulu');
+                return;
+            }
+
+            const rawVault = localStorage.getItem(VAULT_STORAGE_KEY);
+            if (!rawVault) {
+                if (!options.silent) showToast('Tidak ada vault terenkripsi untuk dikirim');
+                return;
+            }
+
+            setSyncStatus('syncing', 'Mengirim ciphertext ke Cloud...');
+
+            try {
+                const payload = {
+                    description: 'ChronoDocs v2.0 Pro — Encrypted Zero-Knowledge Vault (AES-256-GCM)',
+                    public: false,
+                    files: {
+                        'chronodocs_vault.chronodoc': {
+                            content: rawVault
+                        }
+                    }
+                };
+
+                const url = gistId ? `https://api.github.com/gists/${gistId}` : 'https://api.github.com/gists';
+                const method = gistId ? 'PATCH' : 'POST';
+
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    throw new Error(`GitHub API Error (${res.status})`);
+                }
+
+                const data = await res.json();
+                gistId = data.id;
+
+                const newCfg = {
+                    token,
+                    gistId,
+                    autoSync,
+                    lastSyncedAt: Date.now()
+                };
+                saveCloudConfig(newCfg);
+                setSyncStatus('synced', 'Tersinkronisasi ke Zero-Knowledge Cloud');
+                if (!options.silent) {
+                    showToast('Vault terenkripsi berhasil disimpan ke Cloud (Gist ID: ' + gistId.slice(0, 8) + '...)');
+                }
+            } catch (err) {
+                console.error('Cloud push failed:', err);
+                setSyncStatus('error', 'Gagal sinkronisasi Cloud');
+                if (!options.silent) {
+                    showToast('Gagal mengirim ke Cloud. Periksa Token GitHub & izin "gist".');
+                }
+            }
+        }
+
+        async function pullEncryptedVaultFromCloud() {
+            const token = document.getElementById('inputGithubToken').value.trim();
+            const gistId = document.getElementById('inputGistId').value.trim();
+
+            if (!token || !gistId) {
+                showToast('Masukkan GitHub Token dan ID Gist untuk menarik data dari Cloud');
+                return;
+            }
+
+            setSyncStatus('syncing', 'Menarik ciphertext dari Cloud...');
+
+            try {
+                const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json'
+                    }
+                });
+
+                if (!res.ok) throw new Error(`GitHub API (${res.status})`);
+                const data = await res.json();
+                const fileObj = data.files['chronodocs_vault.chronodoc'] || Object.values(data.files)[0];
+                if (!fileObj || !fileObj.content) {
+                    throw new Error('File vault tidak ditemukan di dalam Gist');
+                }
+
+                const envelope = JSON.parse(fileObj.content);
+                localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(envelope, null, 2));
+
+                saveCloudConfig({
+                    token,
+                    gistId,
+                    autoSync: document.getElementById('chkAutoCloudSync').checked,
+                    lastSyncedAt: Date.now()
+                });
+
+                if (currentSessionPin && !isVaultLocked) {
+                    try {
+                        const decrypted = await decryptVaultPayload(envelope, currentSessionPin);
+                        vaultData = decrypted;
+                        renderAll();
+                        document.getElementById('cloudSyncModal').classList.add('hidden');
+                        setSyncStatus('synced', 'Data Cloud berhasil dibuka');
+                        showToast('Data terbaru dari Cloud berhasil ditarik & didekripsi!');
+                        return;
+                    } catch (decErr) {
+                        // Different PIN used on cloud vault; lock and ask for PIN
+                        document.getElementById('cloudSyncModal').classList.add('hidden');
+                        lockVaultImmediately('Data Cloud ditarik! Masukkan PIN 6 angka untuk membukanya.');
+                        return;
+                    }
+                } else {
+                    document.getElementById('cloudSyncModal').classList.add('hidden');
+                    initLockScreenState();
+                    showToast('Vault Cloud berhasil diunduh! Masukkan PIN 6 angka Anda.');
+                }
+            } catch (err) {
+                console.error('Cloud pull error:', err);
+                setSyncStatus('error', 'Gagal menarik dari Cloud');
+                showToast('Gagal menarik data Cloud. Pastikan Token & Gist ID benar.');
+            }
+        }
+
+        // ====================================================================
+        // H. MULTI-TOPIC & REVERSE-CHRONOLOGICAL SHEETS OPERATIONS
+        // ====================================================================
+        function getActiveTopic() {
+            let topic = vaultData.topics.find(t => t.id === vaultData.activeTopicId);
+            if (!topic && vaultData.topics.length > 0) {
+                topic = vaultData.topics[0];
+                vaultData.activeTopicId = topic.id;
+            }
+            return topic;
+        }
+
+        function getSortedSheetsForTopic(topic) {
+            if (!topic || !Array.isArray(topic.sheets)) return [];
+            const copy = [...topic.sheets];
+            copy.sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return sortDirection === 'newest'
+                    ? (b.createdAt - a.createdAt)
+                    : (a.createdAt - b.createdAt);
+            });
+            return copy;
+        }
+
+        function getFilteredSheets() {
+            const q = activeSearchQuery.trim().toLowerCase();
+            let candidateSheets = [];
+
+            if (searchScope === 'all' && q.length > 0) {
+                vaultData.topics.forEach(topic => {
+                    const sorted = getSortedSheetsForTopic(topic);
+                    sorted.forEach(s => {
+                        candidateSheets.push({ ...s, _topicName: topic.name, _topicIcon: topic.icon, _topicId: topic.id });
+                    });
+                });
+            } else {
+                const topic = getActiveTopic();
+                if (topic) {
+                    candidateSheets = getSortedSheetsForTopic(topic).map(s => ({
+                        ...s,
+                        _topicName: topic.name,
+                        _topicIcon: topic.icon,
+                        _topicId: topic.id
+                    }));
+                }
+            }
+
+            return candidateSheets.filter(sheet => {
+                if (activeTagFilter && !(sheet.tags || []).includes(activeTagFilter)) {
+                    return false;
+                }
+                if (q.length > 0) {
+                    const plain = extractPlainText(sheet.content).toLowerCase();
+                    const dateStr = formatExactDate(sheet.createdAt).toLowerCase();
+                    const tagsStr = (sheet.tags || []).map(t => '#' + t).join(' ');
+                    return plain.includes(q) || dateStr.includes(q) || tagsStr.includes(q);
+                }
+                return true;
+            });
+        }
+
+        function findSheetAndTopicById(sheetId) {
+            for (const topic of vaultData.topics) {
+                const sheet = (topic.sheets || []).find(s => s.id === sheetId);
+                if (sheet) return { sheet, topic };
+            }
+            return { sheet: null, topic: null };
+        }
+
+        function createNewSheetAtTop() {
+            const topic = getActiveTopic();
+            if (!topic) return;
+
+            activeSearchQuery = '';
+            activeTagFilter = null;
+            document.getElementById('searchInput').value = '';
+            document.getElementById('btnClearSearch').classList.add('hidden');
+            sortDirection = 'newest';
+            updateSortLabelUI();
+
+            const now = Date.now();
+            const newSheet = {
+                id: 'sheet-' + now + '-' + Math.random().toString(36).slice(2, 6),
+                createdAt: now,
+                updatedAt: now,
+                pinned: false,
+                collapsed: false,
+                tags: [],
+                editLog: [
+                    { time: now, summary: 'Lembar baru dibuat di Halaman 1 (Paling Atas)' }
+                ],
+                content: `<h1 class="doc-title">Judul Catatan Terbaru</h1><h2 class="doc-subtitle">Ditulis pada ${formatExactDate(now)}</h2><p>Ketik catatan terbaru Anda di sini...</p>`
+            };
+
+            topic.sheets.unshift(newSheet);
+            topic.updatedAt = now;
+            activeSheetId = newSheet.id;
+
+            renderAll({ preserveFocus: false });
+            scheduleVaultSave();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => {
+                const editorEl = document.querySelector(`[data-editor-id="${newSheet.id}"]`);
+                if (editorEl) {
+                    editorEl.focus();
+                    const titleEl = editorEl.querySelector('.doc-title');
+                    if (titleEl) {
+                        const range = document.createRange();
+                        range.selectNodeContents(titleEl);
+                        const sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        savedSelectionRange = range.cloneRange();
+                    }
+                }
+            }, 80);
+
+            showToast('Lembar baru ditambahkan di Halaman 1 (Paling Atas)');
+        }
+
+        // Fold / Collapse Functions
+        function toggleSingleSheetFold(sheetId) {
+            const { sheet } = findSheetAndTopicById(sheetId);
+            if (!sheet) return;
+            sheet.collapsed = !sheet.collapsed;
+            renderAll({ preserveFocus: false });
+            scheduleVaultSave();
+        }
+
+        function foldOlderSheetsKeepTopOpen() {
+            const topic = getActiveTopic();
+            if (!topic) return;
+            const sorted = getSortedSheetsForTopic(topic);
+            sorted.forEach((s, idx) => {
+                s.collapsed = (idx > 0);
+            });
+            renderAll({ preserveFocus: false });
+            scheduleVaultSave();
+            showToast('Halaman 2 ke bawah dilipat. Halaman 1 (Terbaru) tetap terbuka.');
+        }
+
+        function setAllSheetsFoldState(collapsedState) {
+            const topic = getActiveTopic();
+            if (!topic) return;
+            topic.sheets.forEach(s => { s.collapsed = collapsedState; });
+            renderAll({ preserveFocus: false });
+            scheduleVaultSave();
+            showToast(collapsedState ? 'Semua lembar dilipat' : 'Semua lembar dibuka');
+        }
+
+        // Print Single Sheet Only
+        function printSingleSheet(sheetId) {
+            const { sheet, topic } = findSheetAndTopicById(sheetId);
+            if (!sheet) return;
+
+            const printArea = document.getElementById('singleSheetPrintArea');
+            printArea.innerHTML = `
+                <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 20px; font-family: 'Inter', sans-serif;">
+                    <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">
+                        ${escapeHtml(topic?.icon || '')} ${escapeHtml(topic?.name || 'ChronoDocs')}
+                    </div>
+                    <div style="font-size: 12px; color: #475569; margin-top: 4px;">
+                        Dibuat: <strong>${formatExactDate(sheet.createdAt)}</strong> &nbsp;|&nbsp; Terakhir Diedit: <strong>${formatExactDate(sheet.updatedAt)}</strong>
+                    </div>
+                </div>
+                <div class="chrono-editor" style="min-height: auto;">
+                    ${sheet.content}
+                </div>
+            `;
+
+            document.body.classList.add('printing-single-sheet');
+            window.print();
+            setTimeout(() => {
+                document.body.classList.remove('printing-single-sheet');
+                printArea.innerHTML = '';
+            }, 500);
+        }
+
+        // ====================================================================
+        // I. RENDERING WORKSPACE (Topics, Sheets Stack, & Right Timeline)
+        // ====================================================================
+        function renderAll(options = { preserveFocus: false }) {
+            if (isVaultLocked) return;
+            renderTopicsSidebar();
+            renderSheetsStack(options);
+            renderTimelineAndStats();
+        }
+
+        function renderTopicsSidebar() {
+            const container = document.getElementById('topicsListContainer');
+            const activeTopic = getActiveTopic();
+
+            container.innerHTML = vaultData.topics.map(topic => {
+                const isSelected = activeTopic && topic.id === activeTopic.id;
+                const count = (topic.sheets || []).length;
+                return `
+                    <div class="group flex items-center justify-between rounded-xl px-2.5 py-2 transition cursor-pointer ${
+                        isSelected
+                            ? 'bg-brand-600 text-white shadow-xs'
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300'
+                    }" data-select-topic="${topic.id}">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <span class="text-base shrink-0">${escapeHtml(topic.icon || '📘')}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-xs font-bold truncate">${escapeHtml(topic.name)}</div>
+                                <div class="text-[10px] ${isSelected ? 'text-brand-100' : 'text-slate-400'}">${count} lembar</div>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            data-edit-topic="${topic.id}"
+                            class="opacity-0 group-hover:opacity-100 p-1 rounded-lg ${isSelected ? 'hover:bg-brand-500 text-white' : 'hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400'} transition cursor-pointer"
+                            title="Pengaturan Topik"
+                        >
+                            <i data-lucide="more-horizontal" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            container.querySelectorAll('[data-select-topic]').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('[data-edit-topic]')) return;
+                    const id = el.getAttribute('data-select-topic');
+                    vaultData.activeTopicId = id;
+                    activeTagFilter = null;
+                    const tp = getActiveTopic();
+                    activeSheetId = tp && tp.sheets.length > 0 ? getSortedSheetsForTopic(tp)[0].id : null;
+                    renderAll();
+                    if (window.innerWidth < 1024) {
+                        document.getElementById('leftSidebar').classList.add('max-lg:-translate-x-full');
+                    }
+                });
+            });
+
+            container.querySelectorAll('[data-edit-topic]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openTopicModal(btn.getAttribute('data-edit-topic'));
+                });
+            });
+
+            // Update Center Topic Banner
+            if (activeTopic) {
+                document.getElementById('activeTopicIconBox').textContent = activeTopic.icon || '📘';
+                document.getElementById('activeTopicTitle').textContent = activeTopic.name;
+                document.getElementById('activeTopicMeta').textContent =
+                    `${activeTopic.sheets.length} Lembar • Diperbarui ${formatRelativeTime(activeTopic.updatedAt)}`;
+            }
+        }
+
+        function renderSheetsStack(options = { preserveFocus: false }) {
+            const filtered = getFilteredSheets();
+            const container = document.getElementById('sheetsContainer');
+            const emptyState = document.getElementById('emptyStateContainer');
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            const focusedEditor = document.activeElement?.classList?.contains('chrono-editor')
+                ? document.activeElement
+                : null;
+            const focusedId = focusedEditor ? focusedEditor.getAttribute('data-editor-id') : null;
+
+            const currentDomIds = Array.from(container.querySelectorAll('.sheet-card')).map(el => el.getAttribute('data-sheet-card-id'));
+            const targetIds = filtered.map(s => s.id);
+            const sameOrder = currentDomIds.length === targetIds.length && currentDomIds.every((id, i) => id === targetIds[i]);
+
+            if (options.preserveFocus && sameOrder && focusedId) {
+                filtered.forEach(s => updateSheetMetaDOM(s));
+                return;
+            }
+
+            container.innerHTML = filtered.map((sheet, index) => {
+                const pageNum = index + 1;
+                const isNewestTop = (index === 0 && sortDirection === 'newest');
+                const titlePreview = extractSheetTitle(sheet.content);
+                const plainText = extractPlainText(sheet.content);
+                const wordCount = countWords(plainText);
+                const isActive = sheet.id === activeSheetId;
+                const isCollapsed = Boolean(sheet.collapsed);
+
+                return `
+                    <article
+                        id="sheet-anchor-${sheet.id}"
+                        data-sheet-card-id="${sheet.id}"
+                        class="sheet-card relative rounded-2xl bg-white dark:bg-slate-900 border ${isActive ? 'active-sheet border-brand-500' : 'border-slate-200/90 dark:border-slate-800'} shadow-2xs overflow-hidden"
+                    >
+                        <!-- Top Accent Strip -->
+                        <div class="h-1.5 w-full ${sheet.pinned ? 'bg-amber-400' : isNewestTop ? 'bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-500' : 'bg-slate-200 dark:bg-slate-800'}"></div>
+
+                        <!-- Sheet Header Bar (Always visible, acts as Folded Summary Bar when collapsed) -->
+                        <div class="px-4 sm:px-7 py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-2 min-w-0 flex-1">
+                                <!-- Fold / Collapse Toggle Button -->
+                                <button
+                                    type="button"
+                                    data-action="fold"
+                                    data-sheet-id="${sheet.id}"
+                                    class="p-1 rounded-lg hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer shrink-0"
+                                    title="${isCollapsed ? 'Buka Lembar Ini' : 'Lipat Lembar Ini'}"
+                                >
+                                    <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-4 h-4"></i>
+                                </button>
+
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[11px] shrink-0 ${
+                                    isNewestTop
+                                        ? 'bg-brand-600 text-white'
+                                        : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                }">
+                                    Hal ${pageNum}${isNewestTop ? ' • TERBARU' : ''}
+                                </span>
+
+                                ${searchScope === 'all' && activeSearchQuery ? `
+                                    <span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-semibold text-[11px] shrink-0">
+                                        ${escapeHtml(sheet._topicIcon)} ${escapeHtml(sheet._topicName)}
+                                    </span>
+                                ` : ''}
+
+                                ${sheet.pinned ? `
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 font-semibold text-[11px] shrink-0">
+                                        ★ Pin
+                                    </span>
+                                ` : ''}
+
+                                <!-- When Collapsed, show Title Preview right in the header bar -->
+                                <span
+                                    data-collapsed-title="${sheet.id}"
+                                    class="${isCollapsed ? 'inline-block' : 'hidden sm:inline-block'} font-semibold text-slate-800 dark:text-slate-200 truncate ml-1 cursor-pointer"
+                                    data-action="fold"
+                                    data-sheet-id="${sheet.id}"
+                                >
+                                    ${escapeHtml(titlePreview)}
+                                </span>
+                            </div>
+
+                            <!-- Right Meta & Sheet Action Buttons -->
+                            <div class="flex items-center gap-1 shrink-0">
+                                <span class="hidden md:inline-flex items-center gap-1 text-[11px] text-slate-400 mr-1" title="Waktu Lembar Dibuat">
+                                    Dibuat: <strong class="text-slate-600 dark:text-slate-300">${formatExactDate(sheet.createdAt)}</strong>
+                                </span>
+
+                                <button
+                                    type="button"
+                                    data-action="history"
+                                    data-sheet-id="${sheet.id}"
+                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-[11px] text-slate-500 dark:text-slate-400 transition cursor-pointer"
+                                    title="Lihat Log Waktu & Riwayat Edit"
+                                >
+                                    <i data-lucide="clock-3" class="w-3.5 h-3.5 text-emerald-500"></i>
+                                    <span data-updated-label="${sheet.id}">${formatRelativeTime(sheet.updatedAt)}</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-action="pin"
+                                    data-sheet-id="${sheet.id}"
+                                    class="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 ${sheet.pinned ? 'text-amber-500' : 'text-slate-400 hover:text-slate-600'} transition cursor-pointer no-print"
+                                    title="${sheet.pinned ? 'Lepas Sematan' : 'Sematkan ke Paling Atas'}"
+                                >
+                                    <i data-lucide="pin" class="w-3.5 h-3.5"></i>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-action="print-sheet"
+                                    data-sheet-id="${sheet.id}"
+                                    class="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-400 hover:text-brand-600 transition cursor-pointer no-print"
+                                    title="Cetak / Simpan PDF Hanya Lembar Ini"
+                                >
+                                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-action="copy"
+                                    data-sheet-id="${sheet.id}"
+                                    class="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition cursor-pointer no-print"
+                                    title="Salin Teks Lembar Ini"
+                                >
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-action="delete"
+                                    data-sheet-id="${sheet.id}"
+                                    class="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 transition cursor-pointer no-print"
+                                    title="Hapus Lembar Ini"
+                                >
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Collapsible Body Wrapper -->
+                        <div class="${isCollapsed ? 'hidden' : 'block'}">
+                            <div class="px-5 sm:px-11 py-6 sm:py-8">
+                                <div
+                                    class="chrono-editor"
+                                    contenteditable="true"
+                                    spellcheck="true"
+                                    data-editor-id="${sheet.id}"
+                                    data-placeholder="Mulai ketik catatan Anda... Gunakan toolbar di atas untuk Title, Subtitle, Description, Tabel, atau 12 warna Stabilo."
+                                >${sheet.content}</div>
+                            </div>
+
+                            <!-- Sheet Footer -->
+                            <div class="px-5 sm:px-11 py-2.5 bg-slate-50/50 dark:bg-slate-900/90 border-t border-slate-100 dark:border-slate-800/70 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+                                <div data-tags-footer="${sheet.id}" class="flex flex-wrap items-center gap-1.5">
+                                    ${(sheet.tags || []).length > 0
+                                        ? sheet.tags.map(t => `<span class="px-2 py-0.5 rounded-md bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-300 font-medium">#${escapeHtml(t)}</span>`).join('')
+                                        : '<span>Ketik #tag di dalam lembar untuk membuat label otomatis</span>'
+                                    }
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span data-wordcount-footer="${sheet.id}">${wordCount} kata</span>
+                                    <span>Halaman ${pageNum} dari ${filtered.length}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+            bindSheetCardEvents();
+        }
+
+        function updateSheetMetaDOM(sheet) {
+            const updatedLabel = document.querySelector(`[data-updated-label="${sheet.id}"]`);
+            if (updatedLabel) updatedLabel.textContent = formatRelativeTime(sheet.updatedAt);
+
+            const titlePreviewEl = document.querySelector(`[data-collapsed-title="${sheet.id}"]`);
+            if (titlePreviewEl) titlePreviewEl.textContent = extractSheetTitle(sheet.content);
+
+            const wordCountLabel = document.querySelector(`[data-wordcount-footer="${sheet.id}"]`);
+            if (wordCountLabel) {
+                wordCountLabel.textContent = `${countWords(extractPlainText(sheet.content))} kata`;
+            }
+
+            const tagsFooter = document.querySelector(`[data-tags-footer="${sheet.id}"]`);
+            if (tagsFooter) {
+                tagsFooter.innerHTML = (sheet.tags || []).length > 0
+                    ? sheet.tags.map(t => `<span class="px-2 py-0.5 rounded-md bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-300 font-medium">#${escapeHtml(t)}</span>`).join('')
+                    : '<span>Ketik #tag di dalam lembar untuk membuat label otomatis</span>';
+            }
+        }
+
+        function renderTimelineAndStats() {
+            const filtered = getFilteredSheets();
+            const timelineList = document.getElementById('timelineJumperList');
+            const badge = document.getElementById('timelineCountBadge');
+            if (badge) badge.textContent = `${filtered.length} Hal`;
+
+            // Global Footer Stats
+            let totalSheetsAll = 0;
+            vaultData.topics.forEach(t => { totalSheetsAll += (t.sheets || []).length; });
+            const statsEl = document.getElementById('globalStatsText');
+            if (statsEl) statsEl.textContent = `${vaultData.topics.length} Topik • ${totalSheetsAll} Lembar`;
+
+            // Active Topic Hashtags
+            const activeTopic = getActiveTopic();
+            const tagSet = new Set();
+            if (activeTopic) {
+                (activeTopic.sheets || []).forEach(s => (s.tags || []).forEach(tg => tagSet.add(tg)));
+            }
+            const tagSection = document.getElementById('tagFilterSection');
+            const tagPillsContainer = document.getElementById('tagPillsContainer');
+            const btnClearTag = document.getElementById('btnClearTagFilter');
+
+            if (tagSet.size > 0) {
+                tagSection.classList.remove('hidden');
+                btnClearTag.classList.toggle('hidden', !activeTagFilter);
+                tagPillsContainer.innerHTML = Array.from(tagSet).map(tg => `
+                    <button
+                        type="button"
+                        data-filter-tag="${escapeHtml(tg)}"
+                        class="px-2 py-0.5 rounded-lg text-[11px] font-medium transition cursor-pointer ${
+                            activeTagFilter === tg
+                                ? 'bg-brand-600 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-50'
+                        }"
+                    >#${escapeHtml(tg)}</button>
+                `).join('');
+
+                tagPillsContainer.querySelectorAll('[data-filter-tag]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tg = btn.getAttribute('data-filter-tag');
+                        activeTagFilter = (activeTagFilter === tg) ? null : tg;
+                        renderAll();
+                    });
+                });
+            } else {
+                tagSection.classList.add('hidden');
+            }
+
+            // Render Right Floating Timeline Jumper
+            timelineList.innerHTML = filtered.map((sheet, idx) => {
+                const pageNo = idx + 1;
+                const isCurrent = sheet.id === activeSheetId;
+                const title = extractSheetTitle(sheet.content);
+                return `
+                    <button
+                        type="button"
+                        data-timeline-jump="${sheet.id}"
+                        class="group relative w-full text-left p-2 rounded-xl transition cursor-pointer block ${
+                            isCurrent
+                                ? 'bg-brand-50 dark:bg-brand-950/60 text-brand-900 dark:text-white ring-1 ring-brand-300 dark:ring-brand-700'
+                                : 'hover:bg-slate-100 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-300'
+                        }"
+                    >
+                        <!-- Timeline Dot on Left Border -->
+                        <span class="w-2.5 h-2.5 rounded-full absolute -left-[18px] top-3.5 border-2 border-white dark:border-slate-900 ${
+                            idx === 0 && sortDirection === 'newest' ? 'bg-brand-600' : isCurrent ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-700'
+                        }"></span>
+
+                        <div class="flex items-center justify-between text-[10px] font-bold mb-0.5">
+                            <span class="${idx === 0 && sortDirection === 'newest' ? 'text-brand-600 dark:text-brand-400' : 'text-slate-400'}">
+                                HALAMAN ${pageNo} ${sheet.collapsed ? '(Terlipat)' : ''}
+                            </span>
+                            <span class="text-slate-400 font-normal">${formatShortDate(sheet.createdAt)}</span>
+                        </div>
+                        <div class="text-xs font-semibold truncate">${escapeHtml(title)}</div>
+                    </button>
+                `;
+            }).join('');
+
+            timelineList.querySelectorAll('[data-timeline-jump]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-timeline-jump');
+                    const { sheet } = findSheetAndTopicById(targetId);
+                    if (sheet && sheet.collapsed) {
+                        sheet.collapsed = false;
+                        renderAll();
+                    }
+                    activeSheetId = targetId;
+                    const cardEl = document.getElementById(`sheet-anchor-${targetId}`);
+                    if (cardEl) {
+                        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        const ed = cardEl.querySelector('.chrono-editor');
+                        if (ed) setTimeout(() => ed.focus(), 250);
+                    }
+                    if (window.innerWidth < 1280) {
+                        document.getElementById('rightTimelineSidebar').classList.add('max-xl:translate-x-full');
+                    }
+                });
+            });
+        }
+
+        // ====================================================================
+        // J. SHEET EDITOR EVENTS & RICH TEXT COMMANDS
+        // ====================================================================
+        function bindSheetCardEvents() {
+            document.querySelectorAll('.chrono-editor').forEach(editor => {
+                const sheetId = editor.getAttribute('data-editor-id');
+
+                editor.addEventListener('focus', () => {
+                    activeSheetId = sheetId;
+                    document.querySelectorAll('.sheet-card').forEach(c => {
+                        c.classList.toggle('active-sheet', c.getAttribute('data-sheet-card-id') === sheetId);
+                    });
+                    renderTimelineAndStats();
+                });
+
+                editor.addEventListener('keyup', () => {
+                    saveCurrentSelection();
+                    handleSheetContentChange(sheetId, editor);
+                });
+
+                editor.addEventListener('mouseup', () => {
+                    saveCurrentSelection();
+                });
+
+                editor.addEventListener('input', () => {
+                    handleSheetContentChange(sheetId, editor);
+                });
+
+                editor.addEventListener('change', (e) => {
+                    if (e.target && e.target.matches('input[type="checkbox"]')) {
+                        if (e.target.checked) {
+                            e.target.setAttribute('checked', 'checked');
+                        } else {
+                            e.target.removeAttribute('checked');
+                        }
+                        handleSheetContentChange(sheetId, editor);
+                    }
+                });
+
+                // Click image inside editor to cycle width: 25% -> 50% -> 75% -> 100%
+                editor.addEventListener('click', (e) => {
+                    if (e.target && e.target.tagName === 'IMG') {
+                        const img = e.target;
+                        if (img.classList.contains('img-w-25')) {
+                            img.classList.remove('img-w-25');
+                            img.classList.add('img-w-50');
+                            showToast('Ukuran gambar: 50%');
+                        } else if (img.classList.contains('img-w-50')) {
+                            img.classList.remove('img-w-50');
+                            img.classList.add('img-w-75');
+                            showToast('Ukuran gambar: 75%');
+                        } else if (img.classList.contains('img-w-75')) {
+                            img.classList.remove('img-w-75');
+                            img.classList.add('img-w-100');
+                            showToast('Ukuran gambar: 100%');
+                        } else {
+                            img.classList.remove('img-w-100');
+                            img.classList.add('img-w-25');
+                            showToast('Ukuran gambar: 25% (Klik gambar lagi untuk mengubah ukuran)');
+                        }
+                        handleSheetContentChange(sheetId, editor);
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-action]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const action = btn.getAttribute('data-action');
+                    const sheetId = btn.getAttribute('data-sheet-id');
+                    if (action === 'fold') toggleSingleSheetFold(sheetId);
+                    if (action === 'history') openHistoryModal(sheetId);
+                    if (action === 'pin') togglePinSheet(sheetId);
+                    if (action === 'print-sheet') printSingleSheet(sheetId);
+                    if (action === 'copy') copySheetText(sheetId);
+                    if (action === 'delete') openDeleteSheetModal(sheetId);
+                });
+            });
+        }
+
+        function handleSheetContentChange(sheetId, editorEl) {
+            const { sheet, topic } = findSheetAndTopicById(sheetId);
+            if (!sheet) return;
+
+            const newHtml = editorEl.innerHTML;
+            if (sheet.content === newHtml) return;
+
+            const now = Date.now();
+            sheet.content = newHtml;
+            sheet.updatedAt = now;
+            sheet.tags = extractHashtags(newHtml);
+            if (topic) topic.updatedAt = now;
+
+            if (!Array.isArray(sheet.editLog)) sheet.editLog = [];
+            const lastLog = sheet.editLog[sheet.editLog.length - 1];
+            if (!lastLog || (now - lastLog.time > 180000)) {
+                sheet.editLog.push({
+                    time: now,
+                    summary: `Diedit: "${extractSheetTitle(newHtml).slice(0, 40)}"`
+                });
+            } else {
+                lastLog.time = now;
+            }
+
+            updateSheetMetaDOM(sheet);
+            renderTimelineAndStats();
+            scheduleVaultSave();
+        }
+
+        function togglePinSheet(sheetId) {
+            const { sheet } = findSheetAndTopicById(sheetId);
+            if (!sheet) return;
+            sheet.pinned = !sheet.pinned;
+            sheet.updatedAt = Date.now();
+            renderAll();
+            scheduleVaultSave();
+            showToast(sheet.pinned ? 'Lembar disematkan ke atas' : 'Sematan dilepas');
+        }
+
+        function saveCurrentSelection() {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                const container = range.commonAncestorContainer;
+                const editorEl = container.nodeType === 1
+                    ? container.closest('.chrono-editor')
+                    : container.parentElement?.closest('.chrono-editor');
+                if (editorEl) {
+                    savedSelectionRange = range.cloneRange();
+                    activeSheetId = editorEl.getAttribute('data-editor-id');
+                }
+            }
+        }
+
+        function restoreSelectionAndFocus() {
+            let targetEditor = activeSheetId
+                ? document.querySelector(`[data-editor-id="${activeSheetId}"]`)
+                : document.querySelector('.chrono-editor');
+            if (!targetEditor) return null;
+            targetEditor.focus();
+            if (savedSelectionRange) {
+                try {
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(savedSelectionRange);
+                } catch (e) {}
+            }
+            return targetEditor;
+        }
+
+        function applyCustomBlockStyle(styleType) {
+            const editor = restoreSelectionAndFocus();
+            if (!editor) return;
+
+            if (styleType === 'title') {
+                document.execCommand('formatBlock', false, 'H1');
+                setBlockClass(editor, 'doc-title', ['doc-subtitle', 'doc-description']);
+            } else if (styleType === 'subtitle') {
+                document.execCommand('formatBlock', false, 'H2');
+                setBlockClass(editor, 'doc-subtitle', ['doc-title', 'doc-description']);
+            } else if (styleType === 'description') {
+                document.execCommand('formatBlock', false, 'BLOCKQUOTE');
+                setBlockClass(editor, 'doc-description', ['doc-title', 'doc-subtitle']);
+            } else if (styleType === 'h1') {
+                document.execCommand('formatBlock', false, 'H1');
+                setBlockClass(editor, null, ['doc-title', 'doc-subtitle', 'doc-description']);
+            } else if (styleType === 'h2') {
+                document.execCommand('formatBlock', false, 'H2');
+                setBlockClass(editor, null, ['doc-title', 'doc-subtitle', 'doc-description']);
+            } else if (styleType === 'normal') {
+                document.execCommand('formatBlock', false, 'P');
+                setBlockClass(editor, null, ['doc-title', 'doc-subtitle', 'doc-description']);
+            } else if (styleType === 'quote') {
+                document.execCommand('formatBlock', false, 'BLOCKQUOTE');
+                setBlockClass(editor, null, ['doc-title', 'doc-subtitle', 'doc-description']);
+            } else if (styleType === 'code') {
+                document.execCommand('formatBlock', false, 'PRE');
+                setBlockClass(editor, null, ['doc-title', 'doc-subtitle', 'doc-description']);
+            }
+            saveCurrentSelection();
+            handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+        }
+
+        function setBlockClass(editor, addCls, removeClsList = []) {
+            const sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) return;
+            let node = sel.anchorNode;
+            if (!node) return;
+            if (node.nodeType === 3) node = node.parentElement;
+            while (node && node.parentElement !== editor && node !== editor) {
+                node = node.parentElement;
+            }
+            if (node && node !== editor) {
+                removeClsList.forEach(c => node.classList.remove(c));
+                if (addCls) node.classList.add(addCls);
+            }
+        }
+
+        // ====================================================================
+        // K. TOPIC MODAL, TABLE GENERATOR, LOCAL FILE & HELPERS
+        // ====================================================================
+        function openTopicModal(topicId = null) {
+            editingTopicId = topicId;
+            const heading = document.getElementById('topicModalHeading');
+            const nameInput = document.getElementById('inputTopicName');
+            const delBtn = document.getElementById('btnDeleteTopicInModal');
+
+            if (topicId) {
+                const t = vaultData.topics.find(x => x.id === topicId);
+                heading.textContent = 'Edit Topik Catatan';
+                nameInput.value = t ? t.name : '';
+                selectedTopicIcon = t ? t.icon : '📘';
+                delBtn.classList.toggle('hidden', vaultData.topics.length <= 1);
+            } else {
+                heading.textContent = 'Buat Topik Catatan Baru';
+                nameInput.value = '';
+                selectedTopicIcon = '📘';
+                delBtn.classList.add('hidden');
+            }
+
+            renderTopicIconPicker();
+            document.getElementById('topicModal').classList.remove('hidden');
+            setTimeout(() => nameInput.focus(), 50);
+        }
+
+        function renderTopicIconPicker() {
+            const picker = document.getElementById('topicIconPicker');
+            picker.innerHTML = TOPIC_ICONS.map(ic => `
+                <button
+                    type="button"
+                    data-pick-icon="${ic}"
+                    class="h-9 rounded-xl text-base flex items-center justify-center border transition cursor-pointer ${
+                        selectedTopicIcon === ic
+                            ? 'bg-brand-50 dark:bg-brand-950 border-brand-500 scale-105'
+                            : 'bg-slate-50 dark:bg-slate-800 border-transparent hover:border-slate-300'
+                    }"
+                >${ic}</button>
+            `).join('');
+
+            picker.querySelectorAll('[data-pick-icon]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedTopicIcon = btn.getAttribute('data-pick-icon');
+                    renderTopicIconPicker();
+                });
+            });
+        }
+
+        function saveTopicFromModal() {
+            const name = document.getElementById('inputTopicName').value.trim() || 'Topik Baru';
+            const now = Date.now();
+
+            if (editingTopicId) {
+                const t = vaultData.topics.find(x => x.id === editingTopicId);
+                if (t) {
+                    t.name = name;
+                    t.icon = selectedTopicIcon;
+                    t.updatedAt = now;
+                }
+            } else {
+                const newTopic = {
+                    id: 'topic-' + now,
+                    name,
+                    icon: selectedTopicIcon,
+                    createdAt: now,
+                    updatedAt: now,
+                    sheets: [
+                        {
+                            id: 'sheet-' + now,
+                            createdAt: now,
+                            updatedAt: now,
+                            pinned: false,
+                            collapsed: false,
+                            tags: [],
+                            editLog: [{ time: now, summary: `Lembar pertama di topik ${name}` }],
+                            content: `<h1 class="doc-title">${escapeHtml(name)} — Lembar 1</h1><h2 class="doc-subtitle">Dibuat pada ${formatExactDate(now)}</h2><p>Mulai tulis catatan untuk topik ini...</p>`
+                        }
+                    ]
+                };
+                vaultData.topics.unshift(newTopic);
+                vaultData.activeTopicId = newTopic.id;
+                activeSheetId = newTopic.sheets[0].id;
+            }
+
+            document.getElementById('topicModal').classList.add('hidden');
+            renderAll();
+            scheduleVaultSave();
+            showToast('Topik berhasil disimpan');
+        }
+
+        // Connect Local Vault File (.chronodoc) via File System Access API
+        async function connectLocalVaultFile() {
+            if ('showSaveFilePicker' in window) {
+                try {
+                    localFileHandle = await window.showSaveFilePicker({
+                        suggestedName: 'catatan-saya.chronodoc',
+                        types: [{
+                            description: 'ChronoDocs Encrypted Vault',
+                            accept: { 'application/json': ['.chronodoc', '.json'] }
+                        }]
+                    });
+                    document.getElementById('localFileStatusBadge').textContent = 'Terhubung';
+                    document.getElementById('localFileStatusBadge').className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold';
+                    await saveAndEncryptVault({ triggerCloud: false });
+                    showToast('File lokal .chronodoc terhubung! Setiap perubahan otomatis ditulis ke file.');
+                } catch (e) {
+                    // User cancelled picker
+                }
+            } else {
+                exportEncryptedVaultFile();
+            }
+        }
+
+        function exportEncryptedVaultFile() {
+            const raw = localStorage.getItem(VAULT_STORAGE_KEY);
+            if (!raw) return;
+            const blob = new Blob([raw], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ChronoDocs-Vault-${new Date().toISOString().slice(0, 10)}.chronodoc`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('File Vault Terenkripsi (.chronodoc) berhasil diunduh');
+        }
+
+        function importEncryptedVaultFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                try {
+                    const parsed = JSON.parse(ev.target.result);
+                    if (parsed && parsed.ciphertext && parsed.salt && parsed.iv) {
+                        localStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(parsed, null, 2));
+                        document.getElementById('cloudSyncModal').classList.add('hidden');
+                        lockVaultImmediately('File Vault berhasil dimuat! Masukkan PIN 6 angka untuk membukanya.');
+                    } else {
+                        showToast('File tidak valid: Bukan file Vault terenkripsi ChronoDocs.');
+                    }
+                } catch (e) {
+                    showToast('Gagal membaca file Vault.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Formatting & Extraction Utilities
+        const fullDateFormatter = new Intl.DateTimeFormat('id-ID', {
+            day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+        const shortDateFormatter = new Intl.DateTimeFormat('id-ID', {
+            day: '2-digit', month: 'short'
+        });
+
+        function formatExactDate(ts) { return ts ? fullDateFormatter.format(new Date(ts)) : '-'; }
+        function formatShortDate(ts) { return ts ? shortDateFormatter.format(new Date(ts)) : '-'; }
+
+        function formatRelativeTime(ts) {
+            if (!ts) return '';
+            const diffSec = Math.floor((Date.now() - ts) / 1000);
+            if (diffSec < 15) return 'baru saja';
+            if (diffSec < 60) return `${diffSec} dtk lalu`;
+            const diffMin = Math.floor(diffSec / 60);
+            if (diffMin < 60) return `${diffMin} mnt lalu`;
+            const diffHour = Math.floor(diffMin / 60);
+            if (diffHour < 24) return `${diffHour} jam lalu`;
+            const diffDay = Math.floor(diffHour / 24);
+            if (diffDay < 7) return `${diffDay} hari lalu`;
+            return formatShortDate(ts);
+        }
+
+        function extractSheetTitle(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html || '';
+            const first = temp.querySelector('.doc-title, h1, h2, p, div');
+            const txt = (first ? first.textContent : temp.textContent || '').trim();
+            return txt ? txt.slice(0, 65) : 'Lembar Tanpa Judul';
+        }
+
+        function extractPlainText(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html || '';
+            return (temp.textContent || temp.innerText || '').trim();
+        }
+
+        function extractHashtags(html) {
+            const text = extractPlainText(html);
+            const matches = text.match(/#[a-zA-Z0-9_-]+/g) || [];
+            return [...new Set(matches.map(t => t.toLowerCase().slice(1)))];
+        }
+
+        function countWords(text) {
+            return (!text || !text.trim()) ? 0 : text.trim().split(/\s+/).length;
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function copySheetText(sheetId) {
+            const { sheet } = findSheetAndTopicById(sheetId);
+            if (!sheet) return;
+            const temp = document.createElement('textarea');
+            temp.value = extractPlainText(sheet.content);
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast('Teks lembar disalin ke clipboard');
+        }
+
+        function openHistoryModal(sheetId) {
+            const { sheet, topic } = findSheetAndTopicById(sheetId);
+            if (!sheet) return;
+            const plain = extractPlainText(sheet.content);
+            document.getElementById('historyModalMeta').innerHTML = `
+                <div class="flex justify-between"><span>Topik:</span><strong>${escapeHtml(topic?.icon)} ${escapeHtml(topic?.name)}</strong></div>
+                <div class="flex justify-between"><span>Dibuat:</span><strong>${formatExactDate(sheet.createdAt)}</strong></div>
+                <div class="flex justify-between"><span>Terakhir Diedit:</span><strong class="text-brand-600 dark:text-brand-400">${formatExactDate(sheet.updatedAt)}</strong></div>
+                <div class="flex justify-between"><span>Jumlah Kata:</span><strong>${countWords(plain)} kata • ${plain.length} karakter</strong></div>
+            `;
+            const logs = [...(sheet.editLog || [])].reverse();
+            document.getElementById('historyLogList').innerHTML = logs.map((l, i) => `
+                <div class="p-2 rounded-xl ${i === 0 ? 'bg-brand-50/70 dark:bg-brand-950/40 border border-brand-200/50' : 'bg-slate-50 dark:bg-slate-800/40'}">
+                    <div class="font-medium text-slate-800 dark:text-slate-200">${escapeHtml(l.summary)}</div>
+                    <div class="text-[11px] text-slate-400">${formatExactDate(l.time)} (${formatRelativeTime(l.time)})</div>
+                </div>
+            `).join('');
+            document.getElementById('historyModal').classList.remove('hidden');
+        }
+
+        function openDeleteSheetModal(sheetId) {
+            const { sheet } = findSheetAndTopicById(sheetId);
+            if (!sheet) return;
+            pendingDeleteAction = { type: 'sheet', id: sheetId };
+            document.getElementById('deleteModalTitle').textContent = 'Hapus Lembar Catatan Ini?';
+            document.getElementById('deleteModalDesc').textContent =
+                `Lembar "${extractSheetTitle(sheet.content)}" akan dihapus permanen dan nomor halaman akan disesuaikan otomatis.`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function updateSortLabelUI() {
+            const lbl = document.getElementById('sortModeLabel');
+            if (lbl) lbl.textContent = sortDirection === 'newest' ? 'Terbaru di Atas' : 'Terlama di Atas';
+        }
+
+        let toastTimer = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            const text = document.getElementById('toastText');
+            if (!toast || !text) return;
+            text.textContent = msg;
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 2800);
+        }
+
+        // ====================================================================
+        // L. INITIALIZE ALL EVENT LISTENERS & SHORTCUTS
+        // ====================================================================
+        function initEventListeners() {
+            // 1. PIN Keypad & Keyboard Input
+            document.querySelectorAll('[data-pin-digit]').forEach(btn => {
+                btn.addEventListener('click', () => handlePinDigitInput(btn.getAttribute('data-pin-digit')));
+            });
+            document.getElementById('btnPinClear').addEventListener('click', () => {
+                pinBuffer = '';
+                updatePinDotsUI();
+            });
+            document.getElementById('btnPinBackspace').addEventListener('click', () => {
+                pinBuffer = pinBuffer.slice(0, -1);
+                updatePinDotsUI();
+            });
+
+            // Lock Screen Footer Actions
+            document.getElementById('btnLockScreenCloudPull').addEventListener('click', () => {
+                populateCloudModalFields();
+                document.getElementById('cloudSyncModal').classList.remove('hidden');
+            });
+            document.getElementById('inputLockScreenVaultFile').addEventListener('change', (e) => {
+                importEncryptedVaultFile(e.target.files?.[0]);
+            });
+            document.getElementById('btnResetVaultEmergency').addEventListener('click', () => {
+                pendingDeleteAction = { type: 'reset-vault' };
+                document.getElementById('deleteModalTitle').textContent = 'Reset & Buat Vault Baru?';
+                document.getElementById('deleteModalDesc').textContent =
+                    'Vault yang tersimpan di browser ini akan dihapus agar Anda bisa membuat PIN 6 angka baru dari awal.';
+                document.getElementById('deleteModal').classList.remove('hidden');
+            });
+
+            // 2. Global Keyboard Listeners: PIN typing, Panic Esc 2x, Alt+N, Alt+Z
+            window.addEventListener('keydown', (e) => {
+                lastActivityTime = Date.now();
+
+                // If Lock Screen is open and no modal is covering it, capture digits 0-9
+                const anyModalOpen = !document.getElementById('cloudSyncModal').classList.contains('hidden') ||
+                                     !document.getElementById('deleteModal').classList.contains('hidden');
+                if (isVaultLocked && !anyModalOpen) {
+                    if (e.key >= '0' && e.key <= '9') {
+                        e.preventDefault();
+                        handlePinDigitInput(e.key);
+                    } else if (e.key === 'Backspace') {
+                        e.preventDefault();
+                        pinBuffer = pinBuffer.slice(0, -1);
+                        updatePinDotsUI();
+                    }
+                    return;
+                }
+
+                // PANIC BUTTON: Press Escape twice within 600ms
+                if (e.key === 'Escape') {
+                    const now = Date.now();
+                    if (now - lastEscapePressTime < 600) {
+                        e.preventDefault();
+                        lockVaultImmediately('Layar dikunci cepat (Tombol Panik Esc 2x)');
+                        lastEscapePressTime = 0;
+                        return;
+                    }
+                    lastEscapePressTime = now;
+                }
+
+                // Alt+N: New Sheet at Top
+                if (e.altKey && e.key.toLowerCase() === 'n') {
+                    e.preventDefault();
+                    createNewSheetAtTop();
+                }
+
+                // Alt+Z: Zen Mode
+                if (e.altKey && e.key.toLowerCase() === 'z') {
+                    e.preventDefault();
+                    toggleZenMode();
+                }
+            });
+
+            // Track activity for Auto-Lock Idle Timer
+            ['mousemove', 'mousedown', 'touchstart', 'scroll'].forEach(evt => {
+                window.addEventListener(evt, () => { lastActivityTime = Date.now(); }, { passive: true });
+            });
+
+            // 3. Rich Text Toolbar Buttons
+            const hlGrid = document.getElementById('highlightGrid');
+            hlGrid.innerHTML = HIGHLIGHT_COLORS.map(c => `
+                <button type="button" data-hl-color="${c.hex}" class="group flex flex-col items-center p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+                    <span class="w-6 h-6 rounded-full border border-slate-300 dark:border-slate-600 group-hover:scale-110 transition" style="background-color: ${c.hex};"></span>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">${c.name}</span>
+                </button>
+            `).join('');
+
+            document.querySelectorAll('.fmt-btn, .block-style-btn, #btnHighlightPicker, #btnInsertChecklist, #btnInsertDivider, #btnInsertNowStamp').forEach(b => {
+                b.addEventListener('mousedown', e => e.preventDefault());
+            });
+
+            document.querySelectorAll('.fmt-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const editor = restoreSelectionAndFocus();
+                    if (!editor) return;
+                    document.execCommand(btn.getAttribute('data-cmd'), false, null);
+                    saveCurrentSelection();
+                    handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+                });
+            });
+
+            document.querySelectorAll('.block-style-btn').forEach(btn => {
+                btn.addEventListener('click', () => applyCustomBlockStyle(btn.getAttribute('data-block')));
+            });
+
+            // Highlight Popover
+            const hlBtn = document.getElementById('btnHighlightPicker');
+            const hlPop = document.getElementById('highlightPopover');
+            hlBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const rect = hlBtn.getBoundingClientRect();
+                hlPop.style.top = `${rect.bottom + 6}px`;
+                hlPop.style.left = `${Math.min(rect.left, window.innerWidth - 270)}px`;
+                hlPop.classList.toggle('hidden');
+            });
+
+            hlGrid.querySelectorAll('[data-hl-color]').forEach(sw => {
+                sw.addEventListener('mousedown', e => e.preventDefault());
+                sw.addEventListener('click', () => {
+                    const hex = sw.getAttribute('data-hl-color');
+                    const editor = restoreSelectionAndFocus();
+                    if (editor) {
+                        document.getElementById('currentHighlightBar').style.backgroundColor = hex;
+                        if (!document.execCommand('hiliteColor', false, hex)) {
+                            document.execCommand('backColor', false, hex);
+                        }
+                        handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+                    }
+                    hlPop.classList.add('hidden');
+                });
+            });
+
+            document.getElementById('btnClearHighlight').addEventListener('click', () => {
+                const editor = restoreSelectionAndFocus();
+                if (editor) {
+                    document.execCommand('hiliteColor', false, 'transparent');
+                    document.execCommand('backColor', false, 'transparent');
+                    handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+                }
+                hlPop.classList.add('hidden');
+            });
+
+            // Checklist, Divider, Timestamp
+            document.getElementById('btnInsertChecklist').addEventListener('click', () => {
+                const editor = restoreSelectionAndFocus();
+                if (!editor) return;
+                document.execCommand('insertHTML', false, `<div class="chrono-check-item"><input type="checkbox"><span>Tugas baru...</span></div><p><br></p>`);
+                handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+            });
+
+            document.getElementById('btnInsertDivider').addEventListener('click', () => {
+                const editor = restoreSelectionAndFocus();
+                if (!editor) return;
+                document.execCommand('insertHTML', false, '<hr><p><br></p>');
+                handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+            });
+
+            document.getElementById('btnInsertNowStamp').addEventListener('click', () => {
+                const editor = restoreSelectionAndFocus();
+                if (!editor) return;
+                const stamp = `<span style="background-color: #e0e7ff; color: #3730a3; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">[${formatExactDate(Date.now())}]</span>&nbsp;`;
+                document.execCommand('insertHTML', false, stamp);
+                handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+            });
+
+            // 4. Table Generator Modal
+            const tableModal = document.getElementById('tableModal');
+            document.getElementById('btnOpenTableModal').addEventListener('click', () => {
+                saveCurrentSelection();
+                tableModal.classList.remove('hidden');
+            });
+            document.getElementById('btnCloseTableModal').addEventListener('click', () => tableModal.classList.add('hidden'));
+            document.getElementById('btnCancelTableModal').addEventListener('click', () => tableModal.classList.add('hidden'));
+            document.getElementById('btnConfirmInsertTable').addEventListener('click', () => {
+                const rows = Math.max(2, Math.min(30, parseInt(document.getElementById('inputTableRows').value) || 3));
+                const cols = Math.max(1, Math.min(10, parseInt(document.getElementById('inputTableCols').value) || 3));
+                const editor = restoreSelectionAndFocus();
+                if (editor) {
+                    let html = '<table><thead><tr>';
+                    for (let c = 1; c <= cols; c++) html += `<th>Judul Kolom ${c}</th>`;
+                    html += '</tr></thead><tbody>';
+                    for (let r = 1; r < rows; r++) {
+                        html += '<tr>';
+                        for (let c = 1; c <= cols; c++) html += `<td>Isi data...</td>`;
+                        html += '</tr>';
+                    }
+                    html += '</tbody></table><p><br></p>';
+                    document.execCommand('insertHTML', false, html);
+                    handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+                }
+                tableModal.classList.add('hidden');
+            });
+
+            // 5. Image Insertion Modal (Canvas Auto-Compress)
+            const imgModal = document.getElementById('imageModal');
+            document.getElementById('btnOpenImageModal').addEventListener('click', () => {
+                saveCurrentSelection();
+                document.getElementById('inputImageUrl').value = '';
+                document.getElementById('inputImageFile').value = '';
+                imgModal.classList.remove('hidden');
+            });
+            document.getElementById('btnCloseImageModal').addEventListener('click', () => imgModal.classList.add('hidden'));
+            document.getElementById('btnCancelImageModal').addEventListener('click', () => imgModal.classList.add('hidden'));
+            document.getElementById('inputImageFile').addEventListener('change', (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 880;
+                        let w = img.width, h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                        }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        insertImageIntoEditor(canvas.toDataURL('image/jpeg', 0.8));
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+                imgModal.classList.add('hidden');
+            });
+            document.getElementById('btnConfirmImageUrl').addEventListener('click', () => {
+                const url = document.getElementById('inputImageUrl').value.trim();
+                if (url) insertImageIntoEditor(url);
+                imgModal.classList.add('hidden');
+            });
+
+            // 6. Top Bar Controls: New Sheet, Fold/Unfold, Sort, Search, Sidebars, Zen, Theme
+            document.getElementById('btnNewSheetTop').addEventListener('click', createNewSheetAtTop);
+            document.getElementById('btnNewSheetFromEmpty').addEventListener('click', createNewSheetAtTop);
+            document.getElementById('btnFoldOldSheets').addEventListener('click', foldOlderSheetsKeepTopOpen);
+            document.getElementById('btnUnfoldAllSheets').addEventListener('click', () => setAllSheetsFoldState(false));
+            document.getElementById('btnFoldAllSheets').addEventListener('click', () => setAllSheetsFoldState(true));
+
+            document.getElementById('btnToggleSort').addEventListener('click', () => {
+                sortDirection = (sortDirection === 'newest') ? 'oldest' : 'newest';
+                updateSortLabelUI();
+                renderAll();
+            });
+
+            // Search & Scope
+            const searchInput = document.getElementById('searchInput');
+            const btnClearSearch = document.getElementById('btnClearSearch');
+            const btnSearchScope = document.getElementById('btnSearchScope');
+
+            searchInput.addEventListener('input', () => {
+                activeSearchQuery = searchInput.value;
+                btnClearSearch.classList.toggle('hidden', !activeSearchQuery.trim());
+                renderAll();
+            });
+            btnClearSearch.addEventListener('click', () => {
+                searchInput.value = '';
+                activeSearchQuery = '';
+                btnClearSearch.classList.add('hidden');
+                renderAll();
+            });
+            btnSearchScope.addEventListener('click', () => {
+                searchScope = (searchScope === 'topic') ? 'all' : 'topic';
+                btnSearchScope.textContent = (searchScope === 'topic') ? 'Topik Ini' : 'Semua Topik';
+                renderAll();
+            });
+            document.getElementById('btnResetFilterEmpty').addEventListener('click', () => {
+                searchInput.value = '';
+                activeSearchQuery = '';
+                activeTagFilter = null;
+                btnClearSearch.classList.add('hidden');
+                renderAll();
+            });
+            document.getElementById('btnClearTagFilter').addEventListener('click', () => {
+                activeTagFilter = null;
+                renderAll();
+            });
+
+            // Sidebars, Zen Mode, Theme, Scroll Top
+            document.getElementById('btnToggleLeftSidebar').addEventListener('click', () => {
+                const sb = document.getElementById('leftSidebar');
+                if (window.innerWidth < 1024) sb.classList.toggle('max-lg:-translate-x-full');
+                else sb.classList.toggle('hidden');
+            });
+            document.getElementById('btnToggleRightTimeline').addEventListener('click', () => {
+                const rb = document.getElementById('rightTimelineSidebar');
+                if (window.innerWidth < 1280) rb.classList.toggle('max-xl:translate-x-full');
+                else rb.classList.toggle('hidden');
+            });
+            document.getElementById('btnZenMode').addEventListener('click', toggleZenMode);
+            document.getElementById('btnThemeToggle').addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify({
+                    dark: document.documentElement.classList.contains('dark'),
+                    autoLockMinutes
+                }));
+            });
+            document.getElementById('btnScrollToTop').addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // 7. Topic Modal Events
+            document.getElementById('btnOpenNewTopicModal').addEventListener('click', () => openTopicModal(null));
+            document.getElementById('btnEditActiveTopic').addEventListener('click', () => {
+                const tp = getActiveTopic();
+                if (tp) openTopicModal(tp.id);
+            });
+            document.getElementById('btnCloseTopicModal').addEventListener('click', () => document.getElementById('topicModal').classList.add('hidden'));
+            document.getElementById('btnCancelTopicModal').addEventListener('click', () => document.getElementById('topicModal').classList.add('hidden'));
+            document.getElementById('btnSaveTopicModal').addEventListener('click', saveTopicFromModal);
+            document.getElementById('btnDeleteTopicInModal').addEventListener('click', () => {
+                if (!editingTopicId || vaultData.topics.length <= 1) return;
+                document.getElementById('topicModal').classList.add('hidden');
+                pendingDeleteAction = { type: 'topic', id: editingTopicId };
+                const t = vaultData.topics.find(x => x.id === editingTopicId);
+                document.getElementById('deleteModalTitle').textContent = 'Hapus Topik Ini?';
+                document.getElementById('deleteModalDesc').textContent =
+                    `Seluruh lembar catatan di dalam topik "${t?.name || ''}" akan ikut terhapus.`;
+                document.getElementById('deleteModal').classList.remove('hidden');
+            });
+
+            // 8. Cloud Sync & Local Vault File Events
+            document.getElementById('btnOpenCloudModal').addEventListener('click', () => {
+                populateCloudModalFields();
+                document.getElementById('cloudSyncModal').classList.remove('hidden');
+            });
+            document.getElementById('btnCloseCloudModal').addEventListener('click', () => document.getElementById('cloudSyncModal').classList.add('hidden'));
+            document.getElementById('btnCloudPushNow').addEventListener('click', () => pushEncryptedVaultToCloud({ silent: false }));
+            document.getElementById('btnCloudPullNow').addEventListener('click', pullEncryptedVaultFromCloud);
+
+            document.getElementById('btnCopyPairingCode').addEventListener('click', () => {
+                const token = document.getElementById('inputGithubToken').value.trim();
+                const gistId = document.getElementById('inputGistId').value.trim();
+                if (!token || !gistId) {
+                    showToast('Simpan ke Cloud minimal 1 kali agar Gist ID terbentuk sebelum menyalin Kode Pairing.');
+                    return;
+                }
+                const code = btoa(JSON.stringify({ t: token, g: gistId }));
+                const temp = document.createElement('textarea');
+                temp.value = code;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                showToast('Kode Pairing disalin! Tempelkan di HP/PC lain untuk menghubungkan Cloud.');
+            });
+
+            document.getElementById('btnApplyPairingCode').addEventListener('click', () => {
+                const rawCode = document.getElementById('inputPairingCode').value.trim();
+                if (!rawCode) return;
+                try {
+                    const decoded = JSON.parse(atob(rawCode));
+                    if (decoded.t && decoded.g) {
+                        document.getElementById('inputGithubToken').value = decoded.t;
+                        document.getElementById('inputGistId').value = decoded.g;
+                        saveCloudConfig({ token: decoded.t, gistId: decoded.g, autoSync: true, lastSyncedAt: null });
+                        showToast('Kode Pairing diterapkan! Menarik data terenkripsi dari Cloud...');
+                        pullEncryptedVaultFromCloud();
+                    }
+                } catch (e) {
+                    showToast('Kode Pairing tidak valid');
+                }
+            });
+
+            document.getElementById('btnConnectLocalFile').addEventListener('click', connectLocalVaultFile);
+            document.getElementById('btnQuickExportVault').addEventListener('click', exportEncryptedVaultFile);
+            document.getElementById('btnExportEncryptedVault').addEventListener('click', exportEncryptedVaultFile);
+            document.getElementById('inputImportEncryptedVault').addEventListener('change', (e) => {
+                importEncryptedVaultFile(e.target.files?.[0]);
+            });
+
+            // 9. Security Modal, Panic Lock & Change PIN
+            document.getElementById('btnPanicLock').addEventListener('click', () => {
+                lockVaultImmediately('Vault dikunci secara manual');
+            });
+            document.getElementById('btnOpenSecurityModal').addEventListener('click', () => {
+                updateCiphertextInspector();
+                document.getElementById('securityModal').classList.remove('hidden');
+            });
+            document.getElementById('btnCloseSecurityModal').addEventListener('click', () => document.getElementById('securityModal').classList.add('hidden'));
+
+            document.getElementById('selectAutoLockMinutes').addEventListener('change', (e) => {
+                autoLockMinutes = parseInt(e.target.value) || 0;
+                const badge = document.getElementById('autoLockCountdownBadge');
+                badge.textContent = autoLockMinutes > 0 ? `${autoLockMinutes}m` : 'Off';
+                showToast(autoLockMinutes > 0 ? `Auto-Lock diatur ke ${autoLockMinutes} menit` : 'Auto-Lock dinonaktifkan');
+            });
+
+            document.getElementById('btnSaveNewPin').addEventListener('click', async () => {
+                const p1 = document.getElementById('inputNewPin').value.trim();
+                const p2 = document.getElementById('inputConfirmNewPin').value.trim();
+                if (!/^\d{6}$/.test(p1)) {
+                    showToast('PIN baru harus terdiri dari 6 angka (0-9)');
+                    return;
+                }
+                if (p1 !== p2) {
+                    showToast('Konfirmasi PIN baru tidak cocok');
+                    return;
+                }
+                currentSessionPin = p1;
+                document.getElementById('inputNewPin').value = '';
+                document.getElementById('inputConfirmNewPin').value = '';
+                await saveAndEncryptVault({ triggerCloud: true });
+                document.getElementById('securityModal').classList.add('hidden');
+                showToast('PIN 6 Angka berhasil diperbarui & Vault dienkripsi ulang!');
+            });
+
+            // 10. History & Delete Confirm Modals
+            document.getElementById('btnCloseHistoryModal').addEventListener('click', () => document.getElementById('historyModal').classList.add('hidden'));
+            document.getElementById('btnCancelDelete').addEventListener('click', () => document.getElementById('deleteModal').classList.add('hidden'));
+            document.getElementById('btnConfirmDelete').addEventListener('click', () => {
+                document.getElementById('deleteModal').classList.add('hidden');
+                if (!pendingDeleteAction) return;
+
+                if (pendingDeleteAction.type === 'sheet') {
+                    const { topic } = findSheetAndTopicById(pendingDeleteAction.id);
+                    if (topic) {
+                        topic.sheets = topic.sheets.filter(s => s.id !== pendingDeleteAction.id);
+                        if (topic.sheets.length === 0) {
+                            createNewSheetAtTop();
+                        } else {
+                            activeSheetId = getSortedSheetsForTopic(topic)[0].id;
+                            renderAll();
+                            scheduleVaultSave();
+                        }
+                        showToast('Lembar catatan dihapus');
+                    }
+                } else if (pendingDeleteAction.type === 'topic') {
+                    vaultData.topics = vaultData.topics.filter(t => t.id !== pendingDeleteAction.id);
+                    vaultData.activeTopicId = vaultData.topics[0]?.id || null;
+                    renderAll();
+                    scheduleVaultSave();
+                    showToast('Topik berhasil dihapus');
+                } else if (pendingDeleteAction.type === 'reset-vault') {
+                    localStorage.removeItem(VAULT_STORAGE_KEY);
+                    currentSessionPin = null;
+                    initLockScreenState();
+                    showToast('Vault direset. Silakan buat PIN 6 angka baru.');
+                }
+                pendingDeleteAction = null;
+            });
+
+            // Close highlight popover on outside click
+            window.addEventListener('click', () => {
+                document.getElementById('highlightPopover').classList.add('hidden');
+            });
+
+            // Cross-Tab Broadcast Listener
+            if (broadcastChannel) {
+                broadcastChannel.onmessage = async (event) => {
+                    if (event.data?.type === 'VAULT_ENCRYPTED_UPDATE' && !isVaultLocked && currentSessionPin) {
+                        try {
+                            const dec = await decryptVaultPayload(event.data.envelope, currentSessionPin);
+                            vaultData = dec;
+                            renderAll({ preserveFocus: true });
+                            setSyncStatus('synced', 'Tersinkronisasi antar tab');
+                        } catch (e) {}
+                    }
+                };
+            }
+        }
+
+        function insertImageIntoEditor(src) {
+            const editor = restoreSelectionAndFocus();
+            if (!editor) return;
+            const safeSrc = src.replace(/"/g, '&quot;');
+            const html = `<p><img src="${safeSrc}" alt="Gambar Catatan" class="img-w-75" onerror="this.src='https://placehold.co/600x350/e2e8f0/475569?text=Gambar+Tidak+Dapat+Dimuat'"/></p><p><br></p>`;
+            document.execCommand('insertHTML', false, html);
+            handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+            showToast('Gambar disisipkan (Klik gambar untuk ubah ukuran 25%/50%/75%/100%)');
+        }
+
+        function toggleZenMode() {
+            const left = document.getElementById('leftSidebar');
+            const right = document.getElementById('rightTimelineSidebar');
+            const isHidden = left.classList.contains('hidden');
+            left.classList.toggle('hidden', !isHidden);
+            right.classList.toggle('hidden', !isHidden);
+            showToast(!isHidden ? 'Mode Fokus (Zen Mode) Aktif — Tekan Alt+Z untuk keluar' : 'Mode Fokus Dinonaktifkan');
+        }
+
+        // Auto-Lock Idle Watcher & Relative Timestamp Refresher
+        setInterval(() => {
+            if (!isVaultLocked && autoLockMinutes > 0) {
+                const idleMs = Date.now() - lastActivityTime;
+                const limitMs = autoLockMinutes * 60 * 1000;
+                if (idleMs >= limitMs) {
+                    lockVaultImmediately(`Vault dikunci otomatis setelah ${autoLockMinutes} menit tanpa aktivitas`);
+                }
+            }
+            if (!isVaultLocked) {
+                const activeTopic = getActiveTopic();
+                if (activeTopic) {
+                    activeTopic.sheets.forEach(s => updateSheetMetaDOM(s));
+                }
+            }
+        }, 10000);
+
+        // Initialize App on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const prefs = JSON.parse(localStorage.getItem(PREFS_STORAGE_KEY) || '{}');
+                if (prefs.dark) document.documentElement.classList.add('dark');
+                if (typeof prefs.autoLockMinutes === 'number') {
+                    autoLockMinutes = prefs.autoLockMinutes;
+                    document.getElementById('selectAutoLockMinutes').value = String(autoLockMinutes);
+                    document.getElementById('autoLockCountdownBadge').textContent = autoLockMinutes > 0 ? `${autoLockMinutes}m` : 'Off';
+                }
+            } catch (e) {}
+
+            lucide.createIcons();
+            initEventListeners();
+            initLockScreenState();
+        });
+    </script>
+</body>
+</html>
