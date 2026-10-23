@@ -3234,7 +3234,7 @@
         });
     </script>
 
-<!-- PATCH FINAL ULTIMATE: PERSISTENT TOKEN & TRUE BACKGROUND AUTO-SYNC -->
+<!-- PATCH FINAL TWO-WAY LIVE SYNC: AUTO-WRITE + AUTO-READ 4 DETIK + PERMANENT TOKEN -->
 <style>
   @media (max-width: 768px) {
     header > div:first-child {
@@ -3272,48 +3272,110 @@
 
 <script>
   (function() {
-    let backgroundSyncTimer = null;
-    let isBusySyncing = false;
+    let writeDebounceTimer = null;
+    let isNetworkBusy = false;
+    let lastTypingTime = 0;
+    let lastSeenCloudCipher = '';
+    let lastPushedLocalCipher = '';
 
-    // Simpan permanen token & Gist ID ke localStorage agar tidak lupa saat refresh
-    function persistCloudCredentials(token, gistId) {
-      if (!token) return;
-      const data = { token: token.trim(), gistId: (gistId || '').trim(), savedAt: Date.now() };
-      localStorage.setItem('chronodocs_permanent_sync', JSON.stringify(data));
+    function isUnlocked() {
+      const lockEl = document.getElementById('lockScreen');
+      return lockEl && lockEl.classList.contains('hidden');
     }
 
-    function getPermanentCloudCredentials() {
+    function setLiveStatus(text, colorClass) {
+      const dot = document.getElementById('syncDot');
+      const txt = document.getElementById('syncStatusText');
+      if (dot) dot.className = 'w-1.5 h-1.5 rounded-full ' + colorClass;
+      if (txt) txt.textContent = text;
+    }
+
+    // 1. SIMPAN TOKEN & GIST ID PERMANEN (Baik saat klik Simpan, Tarik dari Cloud, Hubungkan, maupun saat mengetik di kotak input)
+    function saveCredsPermanently(token, gistId) {
+      const t = (token || '').trim();
+      const g = (gistId || '').trim();
+      if (!t) return;
+
+      const prev = getSavedCreds() || {};
+      const finalGistId = g || prev.gistId || '';
+
+      const payload = { token: t, gistId: finalGistId, autoCloud: true, updatedAt: Date.now() };
+      localStorage.setItem('chronodocs_permanent_sync', JSON.stringify(payload));
+      localStorage.setItem('chronodocs_v2_sync_config', JSON.stringify(payload));
+    }
+
+    function getSavedCreds() {
       try {
-        const raw = localStorage.getItem('chronodocs_permanent_sync');
-        if (raw) return JSON.parse(raw);
+        const p = localStorage.getItem('chronodocs_permanent_sync');
+        if (p) {
+          const parsed = JSON.parse(p);
+          if (parsed && parsed.token) return parsed;
+        }
+        const v2 = localStorage.getItem('chronodocs_v2_sync_config');
+        if (v2) {
+          const parsed2 = JSON.parse(v2);
+          if (parsed2 && parsed2.token) {
+            localStorage.setItem('chronodocs_permanent_sync', JSON.stringify(parsed2));
+            return parsed2;
+          }
+        }
       } catch (_) {}
       return null;
     }
 
-    // Auto-isi kotak input modal agar fungsi asli aplikasi tidak kebingungan
-    function restoreInputFields() {
-      const creds = getPermanentCloudCredentials();
-      if (!creds) return;
+    function captureInputsFromModal() {
+      const tEl = document.querySelector('#syncTokenInput, #gistTokenInput');
+      const gEl = document.querySelector('#syncGistIdInput, #gistIdInput');
+      const pEl = document.getElementById('pairingCodeInput');
+
+      // Jika pengguna menempelkan Kode Pairing (CHRONO-...), langsung ekstrak Token & Gist ID-nya
+      if (pEl && pEl.value && pEl.value.trim().startsWith('CHRONO-')) {
+        try {
+          const decoded = JSON.parse(atob(pEl.value.trim().replace('CHRONO-', '')));
+          if (decoded.token) {
+            saveCredsPermanently(decoded.token, decoded.gistId || '');
+            if (tEl) tEl.value = decoded.token;
+            if (gEl) gEl.value = decoded.gistId || '';
+            return;
+          }
+        } catch (_) {}
+      }
+
+      if (tEl && tEl.value.trim()) {
+        saveCredsPermanently(tEl.value, gEl ? gEl.value : '');
+      }
+    }
+
+    function syncCredsToDOMInputs() {
+      const creds = getSavedCreds();
+      if (!creds) return null;
 
       const tInputs = document.querySelectorAll('#syncTokenInput, #gistTokenInput');
       const gInputs = document.querySelectorAll('#syncGistIdInput, #gistIdInput');
+      const aInputs = document.querySelectorAll('#autoCloudSyncToggle');
 
-      tInputs.forEach(el => { if (el && !el.value) el.value = creds.token; });
-      gInputs.forEach(el => { if (el && !el.value) el.value = creds.gistId; });
+      tInputs.forEach(el => { if (el) el.value = creds.token; });
+      gInputs.forEach(el => { if (el && creds.gistId) el.value = creds.gistId; });
+      aInputs.forEach(el => { if (el) el.checked = true; });
+      return creds;
     }
 
-    // Fungsi Background Push ke Gist
-    async function backgroundPush() {
-      if (isBusySyncing) return;
-      const creds = getPermanentCloudCredentials();
-      const lockEl = document.getElementById('lockScreen');
+    function getLocalVaultCipher() {
+      return localStorage.getItem('chronodocs_v2_encrypted_vault') || localStorage.getItem('chronodocs_vault') || '';
+    }
+
+    // 2. MESIN AUTO-WRITE (Kirim ke Cloud setelah berhenti mengetik)
+    async function autoWriteToCloud() {
+      if (!isUnlocked() || isNetworkBusy) return;
+      const creds = syncCredsToDOMInputs();
       if (!creds || !creds.token || !creds.gistId) return;
-      if (lockEl && !lockEl.classList.contains('hidden')) return; // Jangan push jika masih terkunci PIN
 
-      const localCipher = localStorage.getItem('chronodocs_v2_encrypted_vault') || localStorage.getItem('chronodocs_vault');
-      if (!localCipher) return;
+      const localCipher = getLocalVaultCipher();
+      if (!localCipher || localCipher === lastPushedLocalCipher) return;
 
-      isBusySyncing = true;
+      isNetworkBusy = true;
+      setLiveStatus('Mengirim ke Cloud...', 'bg-amber-500');
+
       try {
         const res = await fetch('https://api.github.com/gists/' + creds.gistId, {
           method: 'PATCH',
@@ -3328,71 +3390,145 @@
         });
 
         if (res.ok) {
-          const dot = document.getElementById('syncDot');
-          const txt = document.getElementById('syncStatusText');
-          if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
-          if (txt) txt.textContent = '☁️ Auto-Sync Cloud Aktif';
+          lastPushedLocalCipher = localCipher;
+          lastSeenCloudCipher = localCipher;
+          setLiveStatus('☁️ Live Sync Aktif (Tersimpan)', 'bg-emerald-500');
         }
       } catch (e) {
-        console.warn('Background push gagal:', e.message);
+        console.warn('Auto-Write gagal:', e.message);
       } finally {
-        isBusySyncing = false;
+        isNetworkBusy = false;
       }
     }
 
-    // Intersep tombol "Simpan & Kirim ke Cloud" bawaan agar tokennya langsung diamankan secara permanen
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('button');
-      if (btn && (btn.textContent.includes('Kirim ke Cloud') || btn.textContent.includes('Simpan'))) {
-        setTimeout(() => {
-          const tEl = document.querySelector('#syncTokenInput, #gistTokenInput');
-          const gEl = document.querySelector('#syncGistIdInput, #gistIdInput');
-          if (tEl && tEl.value) {
-            persistCloudCredentials(tEl.value, gEl ? gEl.value : '');
-          }
-        }, 500);
-      }
-    });
+    // 3. MESIN AUTO-READ (Cek Cloud tiap 4 detik & tarik otomatis jika ada perubahan dari perangkat lain)
+    async function autoReadFromCloud(forcePullOnUnlock = false) {
+      if (!isUnlocked() || isNetworkBusy) return;
 
-    // Pantau ketikan di editor: otomatis simpan ke Cloud 2 detik setelah berhenti mengetik
+      // Jangan ganggu jika pengguna sedang aktif mengetik di perangkat ini (dalam 4 detik terakhir)
+      if (!forcePullOnUnlock && (Date.now() - lastTypingTime < 4000 || writeDebounceTimer !== null)) {
+        return;
+      }
+
+      const creds = syncCredsToDOMInputs();
+      if (!creds || !creds.token || !creds.gistId) return;
+
+      isNetworkBusy = true;
+      try {
+        // Tambahkan timestamp ?_=... & cache: 'no-store' agar browser tidak membaca cache lama
+        const res = await fetch('https://api.github.com/gists/' + creds.gistId + '?_=' + Date.now(), {
+          method: 'GET',
+          headers: {
+            'Authorization': 'token ' + creds.token,
+            'Accept': 'application/vnd.github+json'
+          },
+          cache: 'no-store'
+        });
+
+        if (!res.ok) return;
+        const data = await res.json();
+        const fileObj = data.files['vault.chronodoc'] || Object.values(data.files)[0];
+        if (!fileObj || !fileObj.content) return;
+
+        const cloudCipher = fileObj.content;
+        const localCipher = getLocalVaultCipher();
+
+        // Jika isi Cloud sama persis dengan yang sudah kita lihat sebelumnya, tidak perlu re-render layar
+        if (!forcePullOnUnlock && (cloudCipher === lastSeenCloudCipher || cloudCipher === localCipher)) {
+          lastSeenCloudCipher = cloudCipher;
+          setLiveStatus('☁️ Live Sync Aktif', 'bg-emerald-500');
+          return;
+        }
+
+        // Bandingkan waktu pembuatan amplop enkripsi (ts) agar data lama tidak menimpa data baru
+        let cloudTs = 0, localTs = 0;
+        try { cloudTs = JSON.parse(cloudCipher).ts || 0; } catch (_) {}
+        try { localTs = localCipher ? (JSON.parse(localCipher).ts || 0) : 0; } catch (_) {}
+
+        if (cloudTs >= localTs || forcePullOnUnlock) {
+          lastSeenCloudCipher = cloudCipher;
+          syncCredsToDOMInputs();
+
+          if (typeof pullFromCloudGist === 'function') {
+            await pullFromCloudGist();
+          } else {
+            const pullBtn = document.querySelector('button[onclick*="pullFromCloud"]');
+            if (pullBtn) pullBtn.click();
+          }
+
+          // Catat cipher lokal terbaru setelah dekripsi agar tidak di-push balik ke Cloud
+          setTimeout(() => {
+            lastPushedLocalCipher = getLocalVaultCipher();
+            setLiveStatus('☁️ Live Sync Aktif (Terbaru)', 'bg-emerald-500');
+          }, 400);
+        } else {
+          lastSeenCloudCipher = cloudCipher;
+        }
+      } catch (e) {
+        console.warn('Auto-Read dilewati:', e.message);
+      } finally {
+        isNetworkBusy = false;
+      }
+    }
+
+    // Rekam Token setiap kali pengguna mengetik/menempel di kolom input Sync Modal
     document.addEventListener('input', (e) => {
-      if (e.target && (e.target.isContentEditable || e.target.closest('[contenteditable="true"]'))) {
-        clearTimeout(backgroundSyncTimer);
-        backgroundSyncTimer = setTimeout(() => {
-          backgroundPush();
-        }, 2000);
+      if (e.target && e.target.closest('#syncModal')) {
+        captureInputsFromModal();
+      }
+      // Jika mengetik di lembar catatan, jadwalkan Auto-Write 1.8 detik setelah berhenti mengetik
+      if (isUnlocked() && e.target && (e.target.isContentEditable || e.target.closest('[contenteditable="true"]'))) {
+        lastTypingTime = Date.now();
+        setLiveStatus('Menyimpan ketikan...', 'bg-amber-500');
+        clearTimeout(writeDebounceTimer);
+        writeDebounceTimer = setTimeout(() => {
+          writeDebounceTimer = null;
+          autoWriteToCloud();
+        }, 1800);
       }
     }, true);
 
-    // Saat halaman dimuat / PIN dibuka: pulihkan token & tarik otomatis dari Cloud
+    // Rekam Token juga saat tombol APA PUN di dalam Sync Modal diklik (Tarik dari Cloud, Hubungkan, Simpan)
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+
+      if (btn.closest('#syncModal')) {
+        captureInputsFromModal();
+        setTimeout(captureInputsFromModal, 800);
+      } else if (isUnlocked() && !btn.closest('#lockScreen')) {
+        // Jika klik tombol + Lembar Baru / Hapus / Pin, dorong perubahan ke Cloud
+        setTimeout(() => {
+          if (!writeDebounceTimer) autoWriteToCloud();
+        }, 1000);
+      }
+    }, true);
+
+    // Jalankan saat halaman dibuka & pasang interval Auto-Read setiap 4 detik
     window.addEventListener('DOMContentLoaded', () => {
-      restoreInputFields();
+      syncCredsToDOMInputs();
 
       const lockEl = document.getElementById('lockScreen');
       if (lockEl) {
         const obs = new MutationObserver(() => {
           if (lockEl.classList.contains('hidden')) {
-            restoreInputFields();
-            setTimeout(() => {
-              const creds = getPermanentCloudCredentials();
-              if (creds && creds.token && creds.gistId) {
-                // Panggil fungsi Tarik dari Cloud asli jika ada
-                if (typeof pullFromCloudGist === 'function') {
-                  pullFromCloudGist();
-                } else {
-                  const pullBtn = document.querySelector('button[onclick*="pullFromCloud"]');
-                  if (pullBtn) pullBtn.click();
-                }
-              }
-            }, 600);
+            syncCredsToDOMInputs();
+            setTimeout(() => autoReadFromCloud(true), 400);
           }
         });
         obs.observe(lockEl, { attributes: true, attributeFilter: ['class'] });
       }
+
+      // Pengecekan berkala otomatis setiap 4 detik (membaca kiriman dari perangkat lain tanpa reload)
+      setInterval(() => {
+        autoReadFromCloud(false);
+      }, 4000);
     });
 
-    window.addEventListener('focus', () => {
-      restoreInputFields();
+    // Langsung cek Cloud saat berpindah tab atau layar HP menyala kembali
+    window.addEventListener('focus', () => autoReadFromCloud(false));
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') autoReadFromCloud(false);
     });
   })();
 </script>
