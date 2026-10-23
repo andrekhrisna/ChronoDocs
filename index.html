@@ -3233,5 +3233,41 @@
             initLockScreenState();
         });
     </script>
+<!-- PATCH RESPONSIVE HP UNTUK FILE 178 KB ASLI -->
+<style>
+  @media (max-width: 768px) {
+    /* Buat baris header atas bisa di-scroll ke samping di HP agar tombol Sync & Lembar Baru tidak hilang */
+    header > div:first-child {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+      gap: 0.5rem !important;
+    }
+    header > div:first-child > * {
+      flex-shrink: 0 !important;
+    }
+    body {
+      padding-bottom: 70px !important;
+    }
+  }
+</style>
+
+<!-- Bilah Tombol Bawah Khusus Layar HP -->
+<nav class="md:hidden fixed bottom-0 inset-x-0 z-[90] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-2 flex items-center justify-around shadow-2xl">
+  <button onclick="document.querySelector('header button')?.click()" class="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+    <span>📚 Topik</span>
+  </button>
+  <button onclick="(typeof openSyncModal === 'function') ? openSyncModal() : document.querySelector('[title*=Sync], [onclick*=Sync]')?.click()" class="flex flex-col items-center gap-0.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+    <span>☁️ Sync</span>
+  </button>
+  <button onclick="(typeof createNewSheet === 'function') ? createNewSheet() : document.querySelector('[onclick*=Sheet], [onclick*=Lembar]')?.click()" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow">
+    + Lembar Baru
+  </button>
+  <button onclick="(typeof openSecurityModal === 'function') ? openSecurityModal() : document.querySelector('[title*=PIN], [onclick*=Security]')?.click()" class="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+    <span>🛡️ Auto-Lock</span>
+  </button>
+  <button onclick="(typeof lockVaultNow === 'function') ? lockVaultNow() : document.querySelector('[onclick*=lock], [onclick*=Kunci]')?.click()" class="flex flex-col items-center gap-0.5 text-[10px] font-bold text-rose-600 dark:text-rose-400">
+    <span>🔒 Kunci</span>
+  </button>
+</nav>
 </body>
 </html>
