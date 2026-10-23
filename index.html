@@ -3233,10 +3233,9 @@
             initLockScreenState();
         });
     </script>
-<!-- PATCH RESPONSIVE HP UNTUK FILE 178 KB ASLI -->
+<!-- PATCH LENGKAP: RESPONSIVE HP + AUTO-PULL & AUTO-SYNC PINTAR -->
 <style>
   @media (max-width: 768px) {
-    /* Buat baris header atas bisa di-scroll ke samping di HP agar tombol Sync & Lembar Baru tidak hilang */
     header > div:first-child {
       overflow-x: auto !important;
       -webkit-overflow-scrolling: touch;
@@ -3269,5 +3268,99 @@
     <span>🔒 Kunci</span>
   </button>
 </nav>
-</body>
+
+<script>
+  (function() {
+    let isCheckingCloud = false;
+
+    // 1. Paksa aktifkan centang Auto-Sync secara otomatis jika Token & Gist ID sudah terisi
+    function ensureAutoSyncEnabled() {
+      try {
+        if (typeof getSyncConfig === 'function') {
+          const cfg = getSyncConfig();
+          if (cfg && cfg.token && cfg.gistId && cfg.autoCloud === undefined) {
+            cfg.autoCloud = true;
+            localStorage.setItem('chronodocs_v2_sync_config', JSON.stringify(cfg));
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fungsi Smart Auto-Pull (Hanya menarik jika data di Cloud lebih baru)
+    async function smartAutoPullFromCloud(showNotification = true) {
+      if (isCheckingCloud) return;
+      if (typeof activePin === 'undefined' || !activePin) return;
+      if (typeof getSyncConfig !== 'function') return;
+
+      const cfg = getSyncConfig();
+      if (!cfg || !cfg.token || !cfg.gistId) return;
+
+      isCheckingCloud = true;
+      try {
+        if (typeof setSyncIndicator === 'function') {
+          setSyncIndicator('Mengecek pembaruan Cloud...', 'bg-indigo-500');
+        }
+
+        const res = await fetch(`https://api.github.com/gists/${cfg.gistId}?t=${Date.now()}`, {
+          headers: {
+            'Authorization': `token ${cfg.token}`,
+            'Accept': 'application/vnd.github+json'
+          },
+          cache: 'no-store'
+        });
+
+        if (!res.ok) throw new Error('Gagal menghubungi Cloud');
+        const data = await res.json();
+        const fileObj = data.files['vault.chronodoc'] || Object.values(data.files)[0];
+        if (!fileObj || !fileObj.content) return;
+
+        // Dekripsi data dari Cloud
+        const cloudVault = await decryptVaultPayload(fileObj.content, activePin);
+        const localTime = (typeof vaultData !== 'undefined' && vaultData.updatedAt) ? vaultData.updatedAt : 0;
+        const cloudTime = cloudVault.updatedAt || 0;
+
+        // Jika catatan di Cloud lebih baru daripada di perangkat ini, langsung perbarui!
+        if (cloudTime > localTime) {
+          vaultData = cloudVault;
+          await saveEncryptedVault(true); // Simpan lokal tanpa push balik
+          if (typeof renderAll === 'function') renderAll();
+          if (typeof showToast === 'function' && showNotification) {
+            showToast('☁️ Catatan terbaru otomatis dimuat dari Cloud!');
+          }
+        }
+
+        if (typeof setSyncIndicator === 'function') {
+          setSyncIndicator('Tersinkronisasi dengan Cloud', 'bg-emerald-500');
+        }
+      } catch (err) {
+        console.warn('Auto-Pull dilewati:', err.message);
+      } finally {
+        isCheckingCloud = false;
+      }
+    }
+
+    // 3. Kaitkan Auto-Pull tepat saat PIN 6 Angka berhasil dibuka
+    window.addEventListener('load', () => {
+      ensureAutoSyncEnabled();
+
+      if (typeof unlockVaultSuccess === 'function') {
+        const originalUnlock = unlockVaultSuccess;
+        unlockVaultSuccess = function() {
+          originalUnlock.apply(this, arguments);
+          setTimeout(() => smartAutoPullFromCloud(true), 300);
+        };
+      }
+    });
+
+    // 4. Cek juga secara otomatis saat kembali membuka tab/layar HP (jika PIN sedang terbuka)
+    window.addEventListener('focus', () => {
+      smartAutoPullFromCloud(true);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        smartAutoPullFromCloud(true);
+      }
+    });
+  })();
+</script></body>
 </html>
