@@ -2,7 +2,7 @@
 <html lang="id" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ChronoDocs v2.0 Pro — Catatan Kronologis Terenkripsi</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -253,6 +253,19 @@
             box-shadow: 0 0 12px rgba(99, 102, 241, 0.55);
         }
 
+        /* Flush Bottom Navigation Bar Fix for Xiaomi / Android Chrome */
+        #mobileBottomNav {
+            position: fixed;
+            bottom: 0 !important;
+            left: 0;
+            right: 0;
+            height: calc(52px + env(safe-area-inset-bottom, 0px));
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            will-change: transform;
+        }
+
         /* Custom Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -283,7 +296,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col overflow-x-hidden pb-20 md:pb-0">
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col overflow-x-hidden pb-16 md:pb-0">
 
     <!-- ===================================================================== -->
     <!-- 1. GLOBAL 6-DIGIT PIN LOCK & VAULT SETUP OVERLAY (CLEAN & ERGONOMIC)  -->
@@ -321,7 +334,7 @@
             <!-- Error / Status Message -->
             <div id="pinErrorMsg" class="min-h-[22px] text-center text-xs sm:text-sm font-medium text-rose-400 mb-3"></div>
 
-            <!-- Ergonomic Numeric Keypad (Larger Touch Targets for Mobile Thumbs) -->
+            <!-- Ergonomic Numeric Keypad -->
             <div class="grid grid-cols-3 gap-3 max-w-[300px] mx-auto mb-2">
                 <button type="button" data-pin-digit="1" class="pin-key h-14 sm:h-15 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-xl font-bold text-white border border-slate-700/70 transition cursor-pointer">1</button>
                 <button type="button" data-pin-digit="2" class="pin-key h-14 sm:h-15 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-xl font-bold text-white border border-slate-700/70 transition cursor-pointer">2</button>
@@ -342,14 +355,14 @@
     </div>
 
     <!-- ===================================================================== -->
-    <!-- 2. TOP HEADER & RICH TEXT FORMATTING TOOLBAR (STICKY & ERGONOMIC)     -->
+    <!-- 2. TOP HEADER & 3-CATEGORY COMPACT FORMATTING TOOLBAR (STICKY)        -->
     <!-- ===================================================================== -->
     <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 no-print">
         <div class="max-w-[1800px] mx-auto px-3 sm:px-5 h-15 sm:h-14 py-1.5 flex items-center justify-between gap-2">
             
             <!-- Left: Sidebar Toggle, Brand & Unobstructed Sync Status -->
             <div class="flex items-center gap-2 min-w-0 flex-1 md:flex-initial">
-                <button id="btnToggleLeftSidebar" title="Buka/Tutup Daftar Topik" class="w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer shrink-0">
+                <button id="btnToggleLeftSidebar" title="Buka/Tutup Daftar Topik" class="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer shrink-0">
                     <i data-lucide="panel-left" class="w-5 h-5"></i>
                 </button>
 
@@ -398,11 +411,11 @@
 
             <!-- Right: Mobile Search Toggle & Theme + Desktop Full Actions -->
             <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
-                <!-- Mobile Search Toggle Button (44x44px touch target) -->
+                <!-- Mobile Search Toggle Button -->
                 <button
                     type="button"
                     id="btnMobileSearchToggle"
-                    class="md:hidden w-11 h-11 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                    class="md:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer"
                     title="Cari Catatan"
                 >
                     <i data-lucide="search" class="w-5 h-5"></i>
@@ -431,7 +444,7 @@
                 <!-- Security Settings & Ciphertext Inspector -->
                 <button
                     id="btnOpenSecurityModal"
-                    class="w-11 h-11 md:w-auto md:h-auto flex items-center justify-center gap-1 md:px-2.5 md:py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition cursor-pointer"
+                    class="w-10 h-10 md:w-auto md:h-auto flex items-center justify-center gap-1 md:px-2.5 md:py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition cursor-pointer"
                     title="Pengaturan Keamanan PIN, Auto-Lock & Inspeksi Enkripsi"
                 >
                     <i data-lucide="shield-check" class="w-5 h-5 md:w-4 md:h-4 text-emerald-500"></i>
@@ -460,7 +473,7 @@
                 <!-- Dark Mode Toggle -->
                 <button
                     id="btnThemeToggle"
-                    class="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                    class="w-10 h-10 md:w-9 md:h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer"
                     title="Ganti Tema Terang / Gelap"
                 >
                     <i data-lucide="moon" class="w-5 h-5 md:w-4 md:h-4 dark:hidden"></i>
@@ -503,123 +516,197 @@
             </div>
         </div>
 
-        <!-- RICH TEXT EDITOR FORMATTING TOOLBAR (ERGONOMIC MOBILE TOUCH TARGETS) -->
-        <div class="bg-slate-50/95 dark:bg-slate-900/95 border-t border-slate-200/80 dark:border-slate-800 px-2.5 sm:px-5 py-1.5 overflow-x-auto no-scrollbar">
-            <div class="max-w-[1800px] mx-auto flex items-center gap-1 sm:gap-1 min-w-max">
-                <!-- Undo / Redo -->
-                <button type="button" data-cmd="undo" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer" title="Urungkan (Ctrl+Z)">
-                    <i data-lucide="undo-2" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-                <button type="button" data-cmd="redo" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer" title="Ulangi (Ctrl+Y)">
-                    <i data-lucide="redo-2" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-
-                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
-
-                <!-- Block Style Buttons: Title, Subtitle, Description, H1, H2, Normal, Quote, Code -->
-                <div class="flex items-center bg-white dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700 gap-0.5">
-                    <button type="button" data-block="title" class="block-style-btn px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs sm:text-xs font-extrabold hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition cursor-pointer" title="Judul Utama (Title)">Title</button>
-                    <button type="button" data-block="subtitle" class="block-style-btn px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs sm:text-xs font-medium hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 transition cursor-pointer" title="Subjudul (Subtitle)">Subtitle</button>
-                    <button type="button" data-block="description" class="block-style-btn px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs sm:text-xs italic hover:bg-brand-50 dark:hover:bg-slate-700 text-brand-600 dark:text-brand-300 transition cursor-pointer" title="Blok Deskripsi / Ringkasan">Description</button>
-                    <button type="button" data-block="h1" class="block-style-btn px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs sm:text-xs font-bold hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition cursor-pointer" title="Heading 1">H1</button>
-                    <button type="button" data-block="h2" class="block-style-btn px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs sm:text-xs font-semibold hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition cursor-pointer" title="Heading 2">H2</button>
-                    <button type="button" data-block="normal" class="block-style-btn px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs sm:text-xs hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer" title="Paragraf Normal">Normal</button>
-                    <button type="button" data-block="quote" class="block-style-btn px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs sm:text-xs hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Kutipan (Quote)">Quote</button>
-                    <button type="button" data-block="code" class="block-style-btn px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg text-xs sm:text-xs font-mono hover:bg-brand-50 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 transition cursor-pointer" title="Blok Kode (Code Block)">Code</button>
+        <!-- COMPACT 3-PARENT-CATEGORY FORMATTING TOOLBAR (FITS 100% ON SMARTPHONE SCREEN) -->
+        <div class="bg-slate-50/95 dark:bg-slate-900/95 border-t border-slate-200/80 dark:border-slate-800 px-2.5 sm:px-5 py-1.5">
+            <div class="max-w-[1800px] mx-auto flex items-center justify-between sm:justify-start gap-1.5">
+                
+                <!-- Quick Undo / Redo -->
+                <div class="flex items-center gap-1 shrink-0">
+                    <button type="button" data-cmd="undo" class="fmt-btn w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer" title="Urungkan (Ctrl+Z)">
+                        <i data-lucide="undo-2" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" data-cmd="redo" class="fmt-btn w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer" title="Ulangi (Ctrl+Y)">
+                        <i data-lucide="redo-2" class="w-4 h-4"></i>
+                    </button>
                 </div>
 
-                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+                <div class="hidden sm:block h-5 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
 
-                <!-- Inline Styles -->
-                <button type="button" data-cmd="bold" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Bold (Ctrl+B)">
-                    <i data-lucide="bold" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-                <button type="button" data-cmd="italic" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Italic (Ctrl+I)">
-                    <i data-lucide="italic" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-                <button type="button" data-cmd="underline" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Underline (Ctrl+U)">
-                    <i data-lucide="underline" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-                <button type="button" data-cmd="strikeThrough" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Strikethrough (Coret)">
-                    <i data-lucide="strikethrough" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-                <button type="button" data-cmd="subscript" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Subscript (X₂)">
-                    <i data-lucide="subscript" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-                <button type="button" data-cmd="superscript" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Superscript (X²)">
-                    <i data-lucide="superscript" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
+                <!-- 3 Parent Category Dropdown Triggers -->
+                <div class="flex items-center gap-1.5 flex-1 sm:flex-initial justify-end sm:justify-start">
+                    
+                    <!-- KATEGORI 1: PARAGRAF (Title, Subtitle, Description, H1, H2, Normal, Quote, Code) -->
+                    <button
+                        type="button"
+                        id="btnMenuParagraph"
+                        class="toolbar-dropdown-trigger flex-1 sm:flex-initial h-10 sm:h-9 px-2.5 sm:px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-400 text-slate-800 dark:text-slate-100 text-xs font-semibold flex items-center justify-between sm:justify-center gap-1.5 shadow-2xs transition cursor-pointer"
+                        title="Pilih Gaya Paragraf (Title, Subtitle, H1, H2, Normal, dll.)"
+                    >
+                        <span class="flex items-center gap-1.5 truncate">
+                            <i data-lucide="pilcrow" class="w-4 h-4 text-brand-500 shrink-0"></i>
+                            <span id="currentParagraphLabel" class="truncate">Paragraf</span>
+                        </span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60 shrink-0"></i>
+                    </button>
 
-                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+                    <!-- KATEGORI 2: FORMAT TEKS & STABILO (B, I, U, S, Sub, Sup, Clear + 12 Stabilo) -->
+                    <button
+                        type="button"
+                        id="btnMenuFormat"
+                        class="toolbar-dropdown-trigger flex-1 sm:flex-initial h-10 sm:h-9 px-2.5 sm:px-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-400 text-slate-800 dark:text-slate-100 text-xs font-semibold flex items-center justify-between sm:justify-center gap-1.5 shadow-2xs transition cursor-pointer"
+                        title="Format Huruf (Bold, Italic, dll.) & 12 Warna Stabilo"
+                    >
+                        <span class="flex items-center gap-1.5 truncate">
+                            <i data-lucide="type" class="w-4 h-4 text-amber-500 shrink-0"></i>
+                            <span>Format</span>
+                            <span id="currentHighlightBar" class="w-3 h-3 rounded-full bg-yellow-300 border border-slate-400/50 shrink-0"></span>
+                        </span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60 shrink-0"></i>
+                    </button>
 
-                <!-- 12 Color Highlight Trigger -->
-                <button
-                    type="button"
-                    id="btnHighlightPicker"
-                    class="min-h-[40px] sm:min-h-[32px] flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer"
-                    title="Stabilo / Highlight Teks (12 Warna)"
-                >
-                    <i data-lucide="highlighter" class="w-5 h-5 sm:w-4 sm:h-4 text-amber-500"></i>
-                    <span id="currentHighlightBar" class="w-4 h-4 sm:w-3.5 sm:h-3.5 rounded-full bg-yellow-300 border border-slate-400/50"></span>
-                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60"></i>
-                </button>
+                    <!-- KATEGORI 3: SISIPKAN (List, Checklist, Link, Tabel, Gambar, Garis, Waktu) -->
+                    <button
+                        type="button"
+                        id="btnMenuInsert"
+                        class="toolbar-dropdown-trigger flex-1 sm:flex-initial h-10 sm:h-9 px-2.5 sm:px-3.5 rounded-xl bg-brand-50/80 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-800 hover:bg-brand-100 text-brand-700 dark:text-brand-300 text-xs font-bold flex items-center justify-between sm:justify-center gap-1.5 shadow-2xs transition cursor-pointer"
+                        title="Sisipkan List, Checklist, Link, Tabel, Gambar & Waktu"
+                    >
+                        <span class="flex items-center gap-1 truncate">
+                            <i data-lucide="plus-circle" class="w-4 h-4 text-brand-600 dark:text-brand-400 shrink-0"></i>
+                            <span>Sisipkan</span>
+                        </span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60 shrink-0"></i>
+                    </button>
 
-                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
-
-                <!-- Lists & Checklists -->
-                <button type="button" data-cmd="insertUnorderedList" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Bullet List">
-                    <i data-lucide="list" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-                <button type="button" data-cmd="insertOrderedList" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Numbered List">
-                    <i data-lucide="list-ordered" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-                <button type="button" id="btnInsertChecklist" class="min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Sisipkan Checklist Interaktif">
-                    <i data-lucide="list-checks" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-
-                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
-
-                <!-- Insert Clickable Link (NEW), Table, Image, Divider, Timestamp, Clear Format -->
-                <button type="button" id="btnOpenLinkModal" class="min-h-[40px] sm:min-h-[32px] flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium cursor-pointer" title="Sisipkan Tautan / Link Aktif (Ctrl+K)">
-                    <i data-lucide="link" class="w-5 h-5 sm:w-4 sm:h-4 text-brand-500"></i>
-                    <span>Link</span>
-                </button>
-
-                <button type="button" id="btnOpenTableModal" class="min-h-[40px] sm:min-h-[32px] flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium cursor-pointer" title="Sisipkan Tabel">
-                    <i data-lucide="table" class="w-5 h-5 sm:w-4 sm:h-4 text-indigo-500"></i>
-                    <span>Tabel</span>
-                </button>
-
-                <button type="button" id="btnOpenImageModal" class="min-h-[40px] sm:min-h-[32px] flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium cursor-pointer" title="Sisipkan Gambar (Auto-Compress / URL)">
-                    <i data-lucide="image-plus" class="w-5 h-5 sm:w-4 sm:h-4 text-brand-500"></i>
-                    <span>Gambar</span>
-                </button>
-
-                <button type="button" id="btnInsertDivider" class="min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer" title="Sisipkan Garis Pembatas">
-                    <i data-lucide="minus" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
-
-                <button type="button" id="btnInsertNowStamp" class="min-h-[40px] sm:min-h-[32px] flex items-center gap-1 px-2.5 py-1.5 rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-medium cursor-pointer" title="Sisipkan Cap Waktu Sekarang">
-                    <i data-lucide="calendar-clock" class="w-5 h-5 sm:w-4 sm:h-4 text-emerald-500"></i>
-                    <span>+ Waktu</span>
-                </button>
-
-                <button type="button" data-cmd="removeFormat" class="fmt-btn min-w-[40px] min-h-[40px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-pointer" title="Bersihkan Format">
-                    <i data-lucide="remove-formatting" class="w-5 h-5 sm:w-4 sm:h-4"></i>
-                </button>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- FLOATING 12-COLOR HIGHLIGHT POPOVER -->
-    <div id="highlightPopover" class="hidden fixed z-50 w-64 p-3 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 no-print">
-        <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold text-slate-700 dark:text-slate-200">12 Warna Stabilo</span>
-            <button id="btnClearHighlight" class="text-[11px] text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1 cursor-pointer">
-                <i data-lucide="eraser" class="w-3 h-3"></i> Tanpa Stabilo
+    <!-- ===================================================================== -->
+    <!-- FLOATING DROPDOWN POPOVERS FOR THE 3 PARENT TOOLBAR CATEGORIES        -->
+    <!-- ===================================================================== -->
+
+    <!-- POPOVER 1: GAYA PARAGRAF (Title, Subtitle, Description, H1, H2, Normal, Quote, Code) -->
+    <div id="popoverParagraph" class="hidden fixed z-[80] w-64 p-2 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 no-print">
+        <div class="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilih Gaya Paragraf</div>
+        <div class="space-y-1">
+            <button type="button" data-block="title" data-label="Title" class="block-style-btn w-full px-3 py-2 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 text-left flex items-center justify-between transition cursor-pointer">
+                <span class="text-base font-extrabold text-slate-900 dark:text-white">Title</span>
+                <span class="text-[10px] text-slate-400">Judul Utama</span>
+            </button>
+            <button type="button" data-block="subtitle" data-label="Subtitle" class="block-style-btn w-full px-3 py-2 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 text-left flex items-center justify-between transition cursor-pointer">
+                <span class="text-sm font-medium text-slate-500 dark:text-slate-300">Subtitle</span>
+                <span class="text-[10px] text-slate-400">Subjudul</span>
+            </button>
+            <button type="button" data-block="description" data-label="Description" class="block-style-btn w-full px-3 py-2 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 text-left flex items-center justify-between transition cursor-pointer">
+                <span class="text-xs italic font-semibold text-brand-600 dark:text-brand-300 border-l-2 border-brand-500 pl-2">Description</span>
+                <span class="text-[10px] text-slate-400">Ringkasan</span>
+            </button>
+            <div class="h-px bg-slate-100 dark:bg-slate-800 my-1"></div>
+            <button type="button" data-block="h1" data-label="Heading 1" class="block-style-btn w-full px-3 py-2 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 text-left flex items-center justify-between transition cursor-pointer">
+                <span class="text-sm font-bold text-slate-800 dark:text-slate-100">Heading 1 (H1)</span>
+                <span class="text-[10px] text-slate-400">Bab Utama</span>
+            </button>
+            <button type="button" data-block="h2" data-label="Heading 2" class="block-style-btn w-full px-3 py-2 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 text-left flex items-center justify-between transition cursor-pointer">
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-100">Heading 2 (H2)</span>
+                <span class="text-[10px] text-slate-400">Sub-Bab</span>
+            </button>
+            <button type="button" data-block="normal" data-label="Normal" class="block-style-btn w-full px-3 py-2 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 text-left flex items-center justify-between transition cursor-pointer">
+                <span class="text-xs font-normal text-slate-700 dark:text-slate-200">Normal Text</span>
+                <span class="text-[10px] text-slate-400">Paragraf Biasa</span>
+            </button>
+            <div class="h-px bg-slate-100 dark:bg-slate-800 my-1"></div>
+            <button type="button" data-block="quote" data-label="Quote" class="block-style-btn w-full px-3 py-2 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 text-left flex items-center justify-between transition cursor-pointer">
+                <span class="text-xs italic text-slate-600 dark:text-slate-300">“ Kutipan (Quote) ”</span>
+                <span class="text-[10px] text-slate-400">Blockquote</span>
+            </button>
+            <button type="button" data-block="code" data-label="Code" class="block-style-btn w-full px-3 py-2 rounded-xl hover:bg-brand-50 dark:hover:bg-slate-800 text-left flex items-center justify-between transition cursor-pointer">
+                <span class="text-xs font-mono text-indigo-600 dark:text-indigo-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">&lt;/&gt; Code Block</span>
+                <span class="text-[10px] text-slate-400">Monospace</span>
             </button>
         </div>
-        <div id="highlightGrid" class="grid grid-cols-4 gap-2"></div>
+    </div>
+
+    <!-- POPOVER 2: FORMAT HURUF & 12 WARNA STABILO -->
+    <div id="popoverFormat" class="hidden fixed z-[80] w-72 p-3.5 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 no-print space-y-3">
+        <div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Gaya Huruf (Inline)</div>
+            <div class="grid grid-cols-4 gap-1.5">
+                <button type="button" data-cmd="bold" class="fmt-btn h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 flex items-center justify-center font-bold text-slate-800 dark:text-slate-100 cursor-pointer" title="Bold (Ctrl+B)">
+                    <i data-lucide="bold" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="italic" class="fmt-btn h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-100 cursor-pointer" title="Italic (Ctrl+I)">
+                    <i data-lucide="italic" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="underline" class="fmt-btn h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-100 cursor-pointer" title="Underline (Ctrl+U)">
+                    <i data-lucide="underline" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="strikeThrough" class="fmt-btn h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-100 cursor-pointer" title="Strikethrough">
+                    <i data-lucide="strikethrough" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="subscript" class="fmt-btn h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-100 cursor-pointer" title="Subscript (X₂)">
+                    <i data-lucide="subscript" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="superscript" class="fmt-btn h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-100 cursor-pointer" title="Superscript (X²)">
+                    <i data-lucide="superscript" class="w-4 h-4"></i>
+                </button>
+                <button type="button" data-cmd="removeFormat" class="fmt-btn col-span-2 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 dark:text-rose-300 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer" title="Bersihkan Format">
+                    <i data-lucide="remove-formatting" class="w-4 h-4"></i> Reset Huruf
+                </button>
+            </div>
+        </div>
+
+        <div class="pt-2.5 border-t border-slate-200 dark:border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">12 Warna Stabilo</span>
+                <button id="btnClearHighlight" class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer">
+                    <i data-lucide="eraser" class="w-3 h-3"></i> Tanpa Stabilo
+                </button>
+            </div>
+            <div id="highlightGrid" class="grid grid-cols-4 gap-2"></div>
+        </div>
+    </div>
+
+    <!-- POPOVER 3: SISIPKAN ELEMEN (List, Checklist, Link, Tabel, Gambar, Garis, Waktu) -->
+    <div id="popoverInsert" class="hidden fixed z-[80] w-64 p-2 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 no-print">
+        <div class="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Daftar &amp; Elemen Catatan</div>
+        <div class="space-y-1">
+            <button type="button" data-cmd="insertUnorderedList" class="fmt-btn w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2.5 cursor-pointer">
+                <i data-lucide="list" class="w-4 h-4 text-brand-500"></i>
+                <span>Bullet List (•)</span>
+            </button>
+            <button type="button" data-cmd="insertOrderedList" class="fmt-btn w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2.5 cursor-pointer">
+                <i data-lucide="list-ordered" class="w-4 h-4 text-brand-500"></i>
+                <span>Numbered List (1, 2, 3)</span>
+            </button>
+            <button type="button" id="btnInsertChecklist" class="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2.5 cursor-pointer">
+                <i data-lucide="list-checks" class="w-4 h-4 text-emerald-500"></i>
+                <span>Checklist Interaktif (☑)</span>
+            </button>
+            <div class="h-px bg-slate-100 dark:bg-slate-800 my-1"></div>
+            <button type="button" id="btnOpenLinkModal" class="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-between cursor-pointer">
+                <span class="flex items-center gap-2.5"><i data-lucide="link" class="w-4 h-4 text-brand-500"></i> Tautan / Link Aktif</span>
+                <span class="text-[10px] text-slate-400 font-mono">Ctrl+K</span>
+            </button>
+            <button type="button" id="btnOpenTableModal" class="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2.5 cursor-pointer">
+                <i data-lucide="table" class="w-4 h-4 text-indigo-500"></i>
+                <span>Sisipkan Tabel</span>
+            </button>
+            <button type="button" id="btnOpenImageModal" class="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2.5 cursor-pointer">
+                <i data-lucide="image-plus" class="w-4 h-4 text-purple-500"></i>
+                <span>Sisipkan Gambar</span>
+            </button>
+            <div class="h-px bg-slate-100 dark:bg-slate-800 my-1"></div>
+            <button type="button" id="btnInsertDivider" class="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2.5 cursor-pointer">
+                <i data-lucide="minus" class="w-4 h-4 text-slate-400"></i>
+                <span>Garis Pembatas</span>
+            </button>
+            <button type="button" id="btnInsertNowStamp" class="w-full px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2.5 cursor-pointer">
+                <i data-lucide="calendar-clock" class="w-4 h-4 text-emerald-500"></i>
+                <span>+ Cap Waktu Sekarang</span>
+            </button>
+        </div>
     </div>
 
     <!-- FLOATING CLICKABLE LINK ACTION PILL (MUNCUL SAAT LINK DIKLIK/DISENTUH) -->
@@ -642,22 +729,36 @@
     <!-- ===================================================================== -->
     <div class="flex-1 max-w-[1800px] w-full mx-auto flex relative">
 
-        <!-- Mobile Sidebar Backdrop -->
-        <div id="mobileDrawerBackdrop" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-20 xl:hidden no-print"></div>
+        <!-- Mobile Sidebar Backdrop (z-[65] above sticky header so drawers are never covered) -->
+        <div id="mobileDrawerBackdrop" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-[65] xl:hidden no-print"></div>
 
-        <!-- LEFT SIDEBAR: MULTI-TOPIC / WORKSPACE MANAGER & TAG FILTERS -->
-        <aside id="leftSidebar" class="w-72 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white/75 dark:bg-slate-900/75 backdrop-blur-xs flex flex-col justify-between no-print transition-all duration-200 max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-30 max-lg:bg-white max-lg:dark:bg-slate-900 max-lg:shadow-2xl max-lg:-translate-x-full">
+        <!-- LEFT SIDEBAR: MULTI-TOPIC / WORKSPACE MANAGER (z-[70] on Mobile so Topic #1 is 100% visible) -->
+        <aside id="leftSidebar" class="w-72 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between no-print transition-all duration-200 max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-[70] max-lg:w-80 max-lg:max-w-[86vw] max-lg:shadow-2xl max-lg:-translate-x-full">
+            
+            <!-- Dedicated Mobile Drawer Header Bar -->
+            <div class="lg:hidden px-4 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-brand-600 text-white flex items-center justify-center">
+                        <i data-lucide="folder-kanban" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-bold text-sm text-slate-900 dark:text-white">Buku Catatan &amp; Topik</span>
+                </div>
+                <button type="button" id="btnCloseLeftSidebarMobile" class="w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
             <div class="p-3.5 overflow-y-auto flex-1 space-y-5">
                 
                 <!-- Section 1: Topics / Notebooks List -->
                 <div>
                     <div class="flex items-center justify-between mb-2.5">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Topik / Buku Catatan</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Daftar Topik</span>
                         <button
                             id="btnOpenNewTopicModal"
                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-50 dark:bg-brand-950/80 hover:bg-brand-100 dark:hover:bg-brand-900 text-brand-600 dark:text-brand-300 text-xs font-semibold transition cursor-pointer"
                         >
-                            <i data-lucide="folder-plus" class="w-4 h-4"></i> + Topik
+                            <i data-lucide="folder-plus" class="w-4 h-4"></i> + Topik Baru
                         </button>
                     </div>
                     <div id="topicsListContainer" class="space-y-1.5">
@@ -728,7 +829,7 @@
                             </div>
                         </div>
 
-                        <!-- Fold / Collapse & Sort Controls (Enlarged for Easy Mobile Tapping) -->
+                        <!-- Fold / Collapse & Sort Controls -->
                         <div class="flex flex-wrap items-center gap-2">
                             <button
                                 id="btnFoldOldSheets"
@@ -768,7 +869,7 @@
                 </div>
 
                 <!-- SHEETS STACK CONTAINER -->
-                <div id="sheetsContainer" class="space-y-6 pb-24">
+                <div id="sheetsContainer" class="space-y-6 pb-20">
                     <!-- Rendered dynamically -->
                 </div>
 
@@ -794,13 +895,25 @@
             </div>
         </main>
 
-        <!-- RIGHT SIDEBAR: FLOATING TIMELINE JUMPER -->
-        <aside id="rightTimelineSidebar" class="w-72 xl:w-64 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xs flex flex-col justify-between no-print transition-all duration-200 max-xl:fixed max-xl:inset-y-0 max-xl:right-0 max-xl:z-30 max-xl:bg-white max-xl:dark:bg-slate-900 max-xl:shadow-2xl max-xl:translate-x-full">
+        <!-- RIGHT SIDEBAR: FLOATING TIMELINE JUMPER (z-[70] on Mobile) -->
+        <aside id="rightTimelineSidebar" class="w-72 xl:w-64 shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between no-print transition-all duration-200 max-xl:fixed max-xl:inset-y-0 max-xl:right-0 max-xl:z-[70] max-xl:w-80 max-xl:max-w-[86vw] max-xl:shadow-2xl max-xl:translate-x-full">
+            
+            <!-- Dedicated Mobile Timeline Header -->
+            <div class="xl:hidden px-4 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="git-commit-vertical" class="w-5 h-5 text-brand-500"></i>
+                    <span class="font-bold text-sm text-slate-900 dark:text-white">Timeline Halaman</span>
+                </div>
+                <button type="button" id="btnCloseRightSidebarMobile" class="w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
             <div class="p-3.5 overflow-y-auto flex-1">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
                         <i data-lucide="git-commit-vertical" class="w-4 h-4 text-brand-500"></i>
-                        Timeline Halaman
+                        Loncat ke Halaman
                     </span>
                     <span id="timelineCountBadge" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-300">0 Hal</span>
                 </div>
@@ -812,7 +925,7 @@
             </div>
 
             <div class="p-3.5 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-400 flex items-center justify-between">
-                <span>Klik untuk lompat & buka</span>
+                <span>Klik untuk lompat &amp; buka</span>
                 <button id="btnScrollToTop" class="text-brand-600 dark:text-brand-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer">
                     <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i> Ke Atas
                 </button>
@@ -822,27 +935,29 @@
     </div>
 
     <!-- ===================================================================== -->
-    <!-- MOBILE BOTTOM BAR (ERGONOMIC 64PX HEIGHT & LARGE THUMB TARGETS)       -->
+    <!-- MOBILE BOTTOM BAR (FLUSH TO VERY BOTTOM EDGE FOR XIAOMI REDMI NOTE 11)-->
     <!-- ===================================================================== -->
-    <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 flex items-center justify-around shadow-2xl no-print">
-        <button type="button" id="btnMobileTopics" class="min-w-[56px] min-h-[48px] flex flex-col items-center justify-center gap-1 rounded-xl active:bg-slate-100 dark:active:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-semibold cursor-pointer">
-            <i data-lucide="folder-kanban" class="w-5 h-5"></i>
+    <nav id="mobileBottomNav" class="md:hidden z-50 bg-white/98 dark:bg-slate-900/98 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(0,0,0,0.08)] no-print">
+        <button type="button" id="btnMobileTopics" class="flex-1 h-full flex flex-col items-center justify-center gap-0.5 active:bg-slate-100 dark:active:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-semibold cursor-pointer">
+            <i data-lucide="folder-kanban" class="w-4 h-4"></i>
             <span>Topik</span>
         </button>
-        <button type="button" id="btnMobileSync" class="min-w-[56px] min-h-[48px] flex flex-col items-center justify-center gap-1 rounded-xl active:bg-slate-100 dark:active:bg-slate-800 text-brand-600 dark:text-brand-400 text-[11px] font-bold cursor-pointer">
-            <i data-lucide="cloud-cog" class="w-5 h-5"></i>
+        <button type="button" id="btnMobileSync" class="flex-1 h-full flex flex-col items-center justify-center gap-0.5 active:bg-slate-100 dark:active:bg-slate-800 text-brand-600 dark:text-brand-400 text-[10px] font-bold cursor-pointer">
+            <i data-lucide="cloud-cog" class="w-4 h-4"></i>
             <span>Sync</span>
         </button>
-        <button type="button" id="btnMobileNewSheet" class="min-h-[44px] flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-brand-600 active:scale-95 text-white text-xs font-bold shadow-lg shadow-brand-500/30 cursor-pointer">
-            <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i>
-            <span>Lembar Baru</span>
-        </button>
-        <button type="button" id="btnMobileTimeline" class="min-w-[56px] min-h-[48px] flex flex-col items-center justify-center gap-1 rounded-xl active:bg-slate-100 dark:active:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-semibold cursor-pointer">
-            <i data-lucide="git-commit-vertical" class="w-5 h-5"></i>
+        <div class="px-1 flex items-center justify-center">
+            <button type="button" id="btnMobileNewSheet" class="h-9 flex items-center gap-1 px-3.5 rounded-xl bg-brand-600 active:scale-95 text-white text-xs font-bold shadow-md shadow-brand-500/30 cursor-pointer">
+                <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i>
+                <span>Lembar Baru</span>
+            </button>
+        </div>
+        <button type="button" id="btnMobileTimeline" class="flex-1 h-full flex flex-col items-center justify-center gap-0.5 active:bg-slate-100 dark:active:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-semibold cursor-pointer">
+            <i data-lucide="git-commit-vertical" class="w-4 h-4"></i>
             <span>Timeline</span>
         </button>
-        <button type="button" id="btnMobileLock" class="min-w-[56px] min-h-[48px] flex flex-col items-center justify-center gap-1 rounded-xl active:bg-rose-50 dark:active:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-[11px] font-bold cursor-pointer">
-            <i data-lucide="lock" class="w-5 h-5"></i>
+        <button type="button" id="btnMobileLock" class="flex-1 h-full flex flex-col items-center justify-center gap-0.5 active:bg-rose-50 dark:active:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-[10px] font-bold cursor-pointer">
+            <i data-lucide="lock" class="w-4 h-4"></i>
             <span>Kunci</span>
         </button>
     </nav>
@@ -853,7 +968,7 @@
     <!-- ===================================================================== -->
     <!-- 4. MODAL: ZERO-KNOWLEDGE CLOUD SYNC (GITHUB GIST) & LOCAL VAULT FILE  -->
     <!-- ===================================================================== -->
-    <div id="cloudSyncModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div id="cloudSyncModal" class="hidden fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2.5">
@@ -861,8 +976,8 @@
                         <i data-lucide="cloud-cog" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-base text-slate-900 dark:text-white">Sinkronisasi Zero-Knowledge Cloud & Perangkat</h3>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Auto-Push saat mengetik & Auto-Read otomatis setiap 6 detik</p>
+                        <h3 class="font-bold text-base text-slate-900 dark:text-white">Sinkronisasi Zero-Knowledge Cloud &amp; Perangkat</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Auto-Push saat mengetik &amp; Auto-Read otomatis setiap 6 detik</p>
                     </div>
                 </div>
                 <button id="btnCloseCloudModal" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
@@ -939,7 +1054,7 @@
                         </button>
                         <button type="button" id="btnCloudPushNow" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm cursor-pointer">
                             <i data-lucide="cloud-upload" class="w-4 h-4"></i>
-                            Simpan & Kirim ke Cloud
+                            Simpan &amp; Kirim ke Cloud
                         </button>
                     </div>
                 </div>
@@ -952,7 +1067,7 @@
                     Jalur 2: File Vault Terenkripsi (.chronodoc) untuk Google Drive / Flashdisk
                 </div>
                 <p class="text-xs text-slate-500 dark:text-slate-400">
-                    Anda juga dapat mengekspor atau mengimpor seluruh topik & lembar catatan dalam satu file <code class="font-mono">.chronodoc</code> yang tetap terkunci dengan PIN 6 angka Anda.
+                    Anda juga dapat mengekspor atau mengimpor seluruh topik &amp; lembar catatan dalam satu file <code class="font-mono">.chronodoc</code> yang tetap terkunci dengan PIN 6 angka Anda.
                 </p>
                 <div class="flex flex-wrap gap-2 pt-1">
                     <button type="button" id="btnExportEncryptedVault" class="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
@@ -970,12 +1085,12 @@
     <!-- ===================================================================== -->
     <!-- 5. MODAL: SECURITY SETTINGS, AUTO-LOCK, CHANGE PIN & CIPHERTEXT       -->
     <!-- ===================================================================== -->
-    <div id="securityModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div id="securityModal" class="hidden fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
                     <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
-                    Keamanan Vault, Auto-Lock & Enkripsi
+                    Keamanan Vault, Auto-Lock &amp; Enkripsi
                 </h3>
                 <button id="btnCloseSecurityModal" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -1022,7 +1137,7 @@
                     <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">PBKDF2 + AES-GCM-256</span>
                 </div>
                 <p class="text-[11px] text-slate-400 mb-2">
-                    Inilah wujud asli data Anda yang disimpan di penyimpanan browser & dikirim ke Cloud. Tanpa PIN 6 angka Anda, data ini mustahil dibaca:
+                    Inilah wujud asli data Anda yang disimpan di penyimpanan browser &amp; dikirim ke Cloud. Tanpa PIN 6 angka Anda, data ini mustahil dibaca:
                 </p>
                 <pre id="ciphertextPreviewBox" class="text-[10px] font-mono bg-slate-950 text-emerald-300/90 p-2.5 rounded-xl overflow-x-auto max-h-32 whitespace-pre-wrap break-all"></pre>
             </div>
@@ -1032,7 +1147,7 @@
     <!-- ===================================================================== -->
     <!-- 6. MODAL: CREATE / EDIT TOPIC                                         -->
     <!-- ===================================================================== -->
-    <div id="topicModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div id="topicModal" class="hidden fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
             <div class="flex items-center justify-between mb-3">
                 <h3 id="topicModalHeading" class="font-bold text-base text-slate-900 dark:text-white">Buat Topik Catatan Baru</h3>
@@ -1065,9 +1180,9 @@
     </div>
 
     <!-- ===================================================================== -->
-    <!-- 7. MODAL: INSERT CLICKABLE HYPERLINK (NEW)                            -->
+    <!-- 7. MODAL: INSERT CLICKABLE HYPERLINK                                  -->
     <!-- ===================================================================== -->
-    <div id="linkModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div id="linkModal" class="hidden fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
@@ -1098,7 +1213,7 @@
     <!-- ===================================================================== -->
     <!-- 8. MODAL: TABLE GENERATOR                                             -->
     <!-- ===================================================================== -->
-    <div id="tableModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div id="tableModal" class="hidden fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
@@ -1129,7 +1244,7 @@
     <!-- ===================================================================== -->
     <!-- 9. MODAL: ADD IMAGE (AUTO-COMPRESSED UPLOAD OR URL)                   -->
     <!-- ===================================================================== -->
-    <div id="imageModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div id="imageModal" class="hidden fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
@@ -1145,7 +1260,7 @@
                 <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-brand-500 rounded-xl p-5 cursor-pointer bg-slate-50 dark:bg-slate-800/50 transition">
                     <i data-lucide="upload-cloud" class="w-7 h-7 text-brand-500 mb-1"></i>
                     <span class="text-xs font-medium text-slate-700 dark:text-slate-200">Klik untuk pilih file gambar</span>
-                    <span class="text-[11px] text-slate-400 mt-0.5">Ringan untuk sinkronisasi Cloud & terenkripsi bersama catatan</span>
+                    <span class="text-[11px] text-slate-400 mt-0.5">Ringan untuk sinkronisasi Cloud &amp; terenkripsi bersama catatan</span>
                     <input id="inputImageFile" type="file" accept="image/*" class="hidden" />
                 </label>
             </div>
@@ -1163,12 +1278,12 @@
     <!-- ===================================================================== -->
     <!-- 10. MODAL: SHEET EDIT HISTORY & DELETE CONFIRMATION                   -->
     <!-- ===================================================================== -->
-    <div id="historyModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div id="historyModal" class="hidden fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
                     <i data-lucide="history" class="w-5 h-5 text-brand-500"></i>
-                    Log Waktu Pembuatan & Riwayat Edit
+                    Log Waktu Pembuatan &amp; Riwayat Edit
                 </h3>
                 <button id="btnCloseHistoryModal" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -1180,7 +1295,7 @@
         </div>
     </div>
 
-    <div id="deleteModal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div id="deleteModal" class="hidden fixed inset-0 z-[75] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
             <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-3">
                 <i data-lucide="trash-2" class="w-5 h-5"></i>
@@ -1195,7 +1310,7 @@
     </div>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toastNotification" class="fixed bottom-20 md:bottom-4 right-4 z-[95] hidden items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-xl no-print">
+    <div id="toastNotification" class="fixed bottom-16 md:bottom-4 right-4 z-[95] hidden items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-xl no-print">
         <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 dark:text-emerald-600"></i>
         <span id="toastText">Tersimpan</span>
     </div>
@@ -1496,6 +1611,7 @@
             }
             document.getElementById('pinLockOverlay').classList.remove('hidden');
             hideLinkActionPopover();
+            closeAllFormatPopovers();
             isVaultLocked = true;
         }
 
@@ -1598,6 +1714,7 @@
             currentSessionPin = null;
             pinBuffer = '';
             hideLinkActionPopover();
+            closeAllFormatPopovers();
 
             document.getElementById('sheetsContainer').innerHTML = '';
             document.getElementById('topicsListContainer').innerHTML = '';
@@ -2291,106 +2408,128 @@
                         <!-- Top Accent Strip -->
                         <div class="h-1.5 w-full ${sheet.pinned ? 'bg-amber-400' : isNewestTop ? 'bg-gradient-to-r from-brand-500 via-indigo-500 to-violet-500' : 'bg-slate-200 dark:bg-slate-800'}"></div>
 
-                        <!-- Sheet Header Bar (Ergonomic Mobile Action Buttons) -->
-                        <div class="px-3.5 sm:px-7 py-2.5 sm:py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
-                            <div class="flex items-center gap-2 min-w-0 flex-1">
-                                <button
-                                    type="button"
-                                    data-action="fold"
-                                    data-sheet-id="${sheet.id}"
-                                    class="w-9 h-9 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer shrink-0"
-                                    title="${isCollapsed ? 'Buka Lembar Ini' : 'Lipat Lembar Ini'}"
-                                >
-                                    <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-4 h-4"></i>
-                                </button>
+                        <!-- Sheet Header Bar (2-Row Layout on Mobile so Timestamp sits cleanly below Hal 1 TERBARU) -->
+                        <div class="px-3.5 sm:px-7 py-2.5 sm:py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800/80 text-xs">
+                            
+                            <!-- ROW 1: Page Badge + Title Preview (Left) & Action Icons (Right) -->
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2 min-w-0 flex-1">
+                                    <button
+                                        type="button"
+                                        data-action="fold"
+                                        data-sheet-id="${sheet.id}"
+                                        class="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer shrink-0"
+                                        title="${isCollapsed ? 'Buka Lembar Ini' : 'Lipat Lembar Ini'}"
+                                    >
+                                        <i data-lucide="${isCollapsed ? 'chevron-right' : 'chevron-down'}" class="w-4 h-4"></i>
+                                    </button>
 
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 sm:py-0.5 rounded-full font-bold text-[11px] shrink-0 ${
-                                    isNewestTop
-                                        ? 'bg-brand-600 text-white'
-                                        : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                }">
-                                    Hal ${pageNum}${isNewestTop ? ' • TERBARU' : ''}
-                                </span>
-
-                                ${searchScope === 'all' && activeSearchQuery ? `
-                                    <span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-semibold text-[11px] shrink-0">
-                                        ${escapeHtml(sheet._topicIcon)} ${escapeHtml(sheet._topicName)}
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 sm:py-0.5 rounded-full font-bold text-[11px] shrink-0 ${
+                                        isNewestTop
+                                            ? 'bg-brand-600 text-white'
+                                            : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                                    }">
+                                        Hal ${pageNum}${isNewestTop ? ' • TERBARU' : ''}
                                     </span>
-                                ` : ''}
 
-                                ${sheet.pinned ? `
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 font-semibold text-[11px] shrink-0">
-                                        ★ Pin
+                                    ${searchScope === 'all' && activeSearchQuery ? `
+                                        <span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-semibold text-[11px] shrink-0">
+                                            ${escapeHtml(sheet._topicIcon)} ${escapeHtml(sheet._topicName)}
+                                        </span>
+                                    ` : ''}
+
+                                    ${sheet.pinned ? `
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 font-semibold text-[11px] shrink-0">
+                                            ★ Pin
+                                        </span>
+                                    ` : ''}
+
+                                    <span
+                                        data-collapsed-title="${sheet.id}"
+                                        class="${isCollapsed ? 'inline-block' : 'hidden sm:inline-block'} font-semibold text-slate-800 dark:text-slate-200 truncate ml-1 cursor-pointer"
+                                        data-action="fold"
+                                        data-sheet-id="${sheet.id}"
+                                    >
+                                        ${escapeHtml(titlePreview)}
                                     </span>
-                                ` : ''}
+                                </div>
 
-                                <span
-                                    data-collapsed-title="${sheet.id}"
-                                    class="${isCollapsed ? 'inline-block' : 'hidden sm:inline-block'} font-semibold text-slate-800 dark:text-slate-200 truncate ml-1 cursor-pointer"
-                                    data-action="fold"
-                                    data-sheet-id="${sheet.id}"
-                                >
-                                    ${escapeHtml(titlePreview)}
-                                </span>
+                                <!-- Right Meta (Desktop Only) & Sheet Action Buttons -->
+                                <div class="flex items-center gap-0.5 sm:gap-1 shrink-0">
+                                    <span class="hidden md:inline-flex items-center gap-1 text-[11px] text-slate-400 mr-1" title="Waktu Lembar Dibuat">
+                                        Dibuat: <strong class="text-slate-600 dark:text-slate-300">${formatExactDate(sheet.createdAt)}</strong>
+                                    </span>
+
+                                    <!-- History Button on Desktop/Tablet (Hidden on Mobile because Mobile has Row 2 below) -->
+                                    <button
+                                        type="button"
+                                        data-action="history"
+                                        data-sheet-id="${sheet.id}"
+                                        class="hidden sm:inline-flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-[11px] text-slate-500 dark:text-slate-400 transition cursor-pointer"
+                                        title="Lihat Log Waktu & Riwayat Edit"
+                                    >
+                                        <i data-lucide="clock-3" class="w-3.5 h-3.5 text-emerald-500"></i>
+                                        <span data-updated-label="${sheet.id}">${formatRelativeTime(sheet.updatedAt)}</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-action="pin"
+                                        data-sheet-id="${sheet.id}"
+                                        class="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 ${sheet.pinned ? 'text-amber-500' : 'text-slate-400 hover:text-slate-600'} transition cursor-pointer no-print"
+                                        title="${sheet.pinned ? 'Lepas Sematan' : 'Sematkan ke Paling Atas'}"
+                                    >
+                                        <i data-lucide="pin" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-action="print-sheet"
+                                        data-sheet-id="${sheet.id}"
+                                        class="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-400 hover:text-brand-600 transition cursor-pointer no-print"
+                                        title="Cetak / Simpan PDF Hanya Lembar Ini"
+                                    >
+                                        <i data-lucide="printer" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-action="copy"
+                                        data-sheet-id="${sheet.id}"
+                                        class="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition cursor-pointer no-print"
+                                        title="Salin Teks Lembar Ini"
+                                    >
+                                        <i data-lucide="copy" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        data-action="delete"
+                                        data-sheet-id="${sheet.id}"
+                                        class="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 transition cursor-pointer no-print"
+                                        title="Hapus Lembar Ini"
+                                    >
+                                        <i data-lucide="trash-2" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
+                                    </button>
+                                </div>
                             </div>
 
-                            <!-- Right Meta & Sheet Action Buttons (Larger Touch Targets on Mobile) -->
-                            <div class="flex items-center gap-1 shrink-0">
-                                <span class="hidden md:inline-flex items-center gap-1 text-[11px] text-slate-400 mr-1" title="Waktu Lembar Dibuat">
-                                    Dibuat: <strong class="text-slate-600 dark:text-slate-300">${formatExactDate(sheet.createdAt)}</strong>
-                                </span>
-
+                            <!-- ROW 2 (KHUSUS MOBILE): Keterangan Log Waktu & Riwayat Edit di bawah Hal 1 TERBARU -->
+                            <div class="flex sm:hidden items-center justify-between mt-1.5 pt-1.5 border-t border-slate-200/50 dark:border-slate-800/60 pl-1">
                                 <button
                                     type="button"
                                     data-action="history"
                                     data-sheet-id="${sheet.id}"
-                                    class="min-h-[36px] sm:min-h-0 inline-flex items-center gap-1 px-2 py-1 rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-xs sm:text-[11px] text-slate-500 dark:text-slate-400 transition cursor-pointer"
-                                    title="Lihat Log Waktu & Riwayat Edit"
+                                    class="inline-flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 hover:text-brand-600 transition cursor-pointer"
+                                    title="Ketuk untuk melihat Log Waktu & Riwayat Edit"
                                 >
-                                    <i data-lucide="clock-3" class="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-500"></i>
-                                    <span data-updated-label="${sheet.id}">${formatRelativeTime(sheet.updatedAt)}</span>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    data-action="pin"
-                                    data-sheet-id="${sheet.id}"
-                                    class="w-9 h-9 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 ${sheet.pinned ? 'text-amber-500' : 'text-slate-400 hover:text-slate-600'} transition cursor-pointer no-print"
-                                    title="${sheet.pinned ? 'Lepas Sematan' : 'Sematkan ke Paling Atas'}"
-                                >
-                                    <i data-lucide="pin" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    data-action="print-sheet"
-                                    data-sheet-id="${sheet.id}"
-                                    class="w-9 h-9 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-400 hover:text-brand-600 transition cursor-pointer no-print"
-                                    title="Cetak / Simpan PDF Hanya Lembar Ini"
-                                >
-                                    <i data-lucide="printer" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    data-action="copy"
-                                    data-sheet-id="${sheet.id}"
-                                    class="w-9 h-9 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition cursor-pointer no-print"
-                                    title="Salin Teks Lembar Ini"
-                                >
-                                    <i data-lucide="copy" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    data-action="delete"
-                                    data-sheet-id="${sheet.id}"
-                                    class="w-9 h-9 sm:w-7 sm:h-7 flex items-center justify-center rounded-xl sm:rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 transition cursor-pointer no-print"
-                                    title="Hapus Lembar Ini"
-                                >
-                                    <i data-lucide="trash-2" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
+                                    <i data-lucide="clock-3" class="w-3.5 h-3.5 text-emerald-500 shrink-0"></i>
+                                    <span>Diedit <strong data-updated-label-mobile="${sheet.id}" class="font-semibold text-slate-700 dark:text-slate-200">${formatRelativeTime(sheet.updatedAt)}</strong></span>
+                                    <span class="text-slate-300 dark:text-slate-600">•</span>
+                                    <span>Dibuat ${formatShortDate(sheet.createdAt)}</span>
                                 </button>
                             </div>
+
                         </div>
 
                         <!-- Collapsible Body Wrapper -->
@@ -2401,7 +2540,7 @@
                                     contenteditable="true"
                                     spellcheck="true"
                                     data-editor-id="${sheet.id}"
-                                    data-placeholder="Mulai ketik catatan Anda... Gunakan toolbar di atas untuk Title, Subtitle, Description, Link, Tabel, atau 12 warna Stabilo."
+                                    data-placeholder="Mulai ketik catatan Anda... Gunakan menu Paragraf, Format, atau Sisipkan di atas."
                                 >${sheet.content}</div>
                             </div>
 
@@ -2428,8 +2567,12 @@
         }
 
         function updateSheetMetaDOM(sheet) {
+            const relStr = formatRelativeTime(sheet.updatedAt);
             const updatedLabel = document.querySelector(`[data-updated-label="${sheet.id}"]`);
-            if (updatedLabel) updatedLabel.textContent = formatRelativeTime(sheet.updatedAt);
+            if (updatedLabel) updatedLabel.textContent = relStr;
+
+            const updatedLabelMobile = document.querySelector(`[data-updated-label-mobile="${sheet.id}"]`);
+            if (updatedLabelMobile) updatedLabelMobile.textContent = relStr;
 
             const titlePreviewEl = document.querySelector(`[data-collapsed-title="${sheet.id}"]`);
             if (titlePreviewEl) titlePreviewEl.textContent = extractSheetTitle(sheet.content);
@@ -2550,8 +2693,31 @@
         }
 
         // ====================================================================
-        // J. SHEET EDITOR EVENTS, RICH TEXT COMMANDS & CLICKABLE LINKS
+        // J. SHEET EDITOR EVENTS, 3 DROPDOWN POPOVERS & CLICKABLE LINKS
         // ====================================================================
+        function closeAllFormatPopovers() {
+            document.getElementById('popoverParagraph')?.classList.add('hidden');
+            document.getElementById('popoverFormat')?.classList.add('hidden');
+            document.getElementById('popoverInsert')?.classList.add('hidden');
+        }
+
+        function toggleDropdownPopover(triggerBtn, popoverEl) {
+            const wasHidden = popoverEl.classList.contains('hidden');
+            closeAllFormatPopovers();
+            if (!wasHidden) return;
+
+            popoverEl.classList.remove('hidden');
+            const rect = triggerBtn.getBoundingClientRect();
+            const popWidth = popoverEl.offsetWidth || 260;
+
+            let leftPos = rect.left;
+            if (leftPos + popWidth > window.innerWidth - 10) {
+                leftPos = Math.max(10, window.innerWidth - popWidth - 10);
+            }
+            popoverEl.style.top = `${rect.bottom + 6}px`;
+            popoverEl.style.left = `${leftPos}px`;
+        }
+
         function bindSheetCardEvents() {
             document.querySelectorAll('.chrono-editor').forEach(editor => {
                 const sheetId = editor.getAttribute('data-editor-id');
@@ -2566,7 +2732,6 @@
 
                 editor.addEventListener('keyup', (e) => {
                     saveCurrentSelection();
-                    // Auto-convert plain URL into clickable link when pressing Space or Enter
                     if (e.key === ' ' || e.key === 'Enter') {
                         autoLinkLastTypedUrl(editor);
                     }
@@ -2581,7 +2746,6 @@
                     handleSheetContentChange(sheetId, editor);
                 });
 
-                // Auto-link pasted URLs
                 editor.addEventListener('paste', (e) => {
                     const pastedText = (e.clipboardData || window.clipboardData)?.getData('text/plain') || '';
                     if (/^(https?:\/\/|www\.)[^\s]+$/i.test(pastedText.trim())) {
@@ -2608,14 +2772,12 @@
                 });
 
                 editor.addEventListener('click', (e) => {
-                    // 1. Check if user clicked/tapped a Hyperlink (<a>) inside editor
                     const linkEl = e.target.closest('a');
                     if (linkEl && editor.contains(linkEl)) {
                         showLinkActionPopover(linkEl);
                         return;
                     }
 
-                    // 2. Check if user clicked an Image to cycle width
                     if (e.target && e.target.tagName === 'IMG') {
                         const img = e.target;
                         if (img.classList.contains('img-w-25')) {
@@ -2655,7 +2817,6 @@
             });
         }
 
-        // Auto-convert typed URL right before cursor into an <a> tag
         function autoLinkLastTypedUrl(editorEl) {
             const sel = window.getSelection();
             if (!sel || !sel.rangeCount) return;
@@ -2686,7 +2847,6 @@
             urlRange.deleteContents();
             urlRange.insertNode(a);
 
-            // Restore cursor after space
             const afterRange = document.createRange();
             afterRange.setStartAfter(a);
             afterRange.collapse(true);
@@ -2694,7 +2854,6 @@
             sel.addRange(afterRange);
         }
 
-        // Show Floating Link Pill when an <a> tag is clicked/tapped
         function showLinkActionPopover(linkEl) {
             activeClickedLinkEl = linkEl;
             const pop = document.getElementById('linkActionPopover');
@@ -2800,7 +2959,7 @@
             return targetEditor;
         }
 
-        function applyCustomBlockStyle(styleType) {
+        function applyCustomBlockStyle(styleType, displayLabel = 'Paragraf') {
             const editor = restoreSelectionAndFocus();
             if (!editor) return;
 
@@ -2829,6 +2988,9 @@
                 document.execCommand('formatBlock', false, 'PRE');
                 setBlockClass(editor, null, ['doc-title', 'doc-subtitle', 'doc-description']);
             }
+            const lbl = document.getElementById('currentParagraphLabel');
+            if (lbl && displayLabel) lbl.textContent = displayLabel;
+
             saveCurrentSelection();
             handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
         }
@@ -2934,6 +3096,7 @@
             }
 
             document.getElementById('topicModal').classList.add('hidden');
+            closeMobileSidebars();
             renderAll();
             scheduleVaultSave();
             showToast('Topik berhasil disimpan');
@@ -2941,6 +3104,7 @@
 
         function openLinkModal() {
             saveCurrentSelection();
+            closeAllFormatPopovers();
             const selText = savedSelectionRange ? savedSelectionRange.toString().trim() : '';
             document.getElementById('inputLinkText').value = selText;
             document.getElementById('inputLinkUrl').value = '';
@@ -3187,6 +3351,7 @@
                 // PANIC BUTTON: Press Escape twice within 600ms
                 if (e.key === 'Escape') {
                     hideLinkActionPopover();
+                    closeAllFormatPopovers();
                     const now = Date.now();
                     if (now - lastEscapePressTime < 600) {
                         e.preventDefault();
@@ -3217,17 +3382,41 @@
                 window.addEventListener(evt, () => { lastActivityTime = Date.now(); }, { passive: true });
             });
 
-            // 3. Rich Text Toolbar Buttons
+            // 3. 3-Category Dropdown Toolbar Triggers & Format Actions
             const hlGrid = document.getElementById('highlightGrid');
             hlGrid.innerHTML = HIGHLIGHT_COLORS.map(c => `
-                <button type="button" data-hl-color="${c.hex}" class="group flex flex-col items-center p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+                <button type="button" data-hl-color="${c.hex}" class="group flex flex-col items-center p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
                     <span class="w-6 h-6 rounded-full border border-slate-300 dark:border-slate-600 group-hover:scale-110 transition" style="background-color: ${c.hex};"></span>
                     <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">${c.name}</span>
                 </button>
             `).join('');
 
-            document.querySelectorAll('.fmt-btn, .block-style-btn, #btnHighlightPicker, #btnInsertChecklist, #btnInsertDivider, #btnInsertNowStamp, #btnOpenLinkModal').forEach(b => {
+            // Prevent editor focus loss when clicking toolbar triggers or items
+            document.querySelectorAll('.fmt-btn, .block-style-btn, .toolbar-dropdown-trigger, #btnInsertChecklist, #btnInsertDivider, #btnInsertNowStamp, #btnOpenLinkModal, #btnOpenTableModal, #btnOpenImageModal').forEach(b => {
                 b.addEventListener('mousedown', e => e.preventDefault());
+            });
+
+            const btnMenuParagraph = document.getElementById('btnMenuParagraph');
+            const btnMenuFormat    = document.getElementById('btnMenuFormat');
+            const btnMenuInsert    = document.getElementById('btnMenuInsert');
+            const popParagraph     = document.getElementById('popoverParagraph');
+            const popFormat        = document.getElementById('popoverFormat');
+            const popInsert        = document.getElementById('popoverInsert');
+
+            btnMenuParagraph.addEventListener('click', (e) => {
+                e.stopPropagation();
+                saveCurrentSelection();
+                toggleDropdownPopover(btnMenuParagraph, popParagraph);
+            });
+            btnMenuFormat.addEventListener('click', (e) => {
+                e.stopPropagation();
+                saveCurrentSelection();
+                toggleDropdownPopover(btnMenuFormat, popFormat);
+            });
+            btnMenuInsert.addEventListener('click', (e) => {
+                e.stopPropagation();
+                saveCurrentSelection();
+                toggleDropdownPopover(btnMenuInsert, popInsert);
             });
 
             document.querySelectorAll('.fmt-btn').forEach(btn => {
@@ -3237,21 +3426,15 @@
                     document.execCommand(btn.getAttribute('data-cmd'), false, null);
                     saveCurrentSelection();
                     handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+                    closeAllFormatPopovers();
                 });
             });
 
             document.querySelectorAll('.block-style-btn').forEach(btn => {
-                btn.addEventListener('click', () => applyCustomBlockStyle(btn.getAttribute('data-block')));
-            });
-
-            const hlBtn = document.getElementById('btnHighlightPicker');
-            const hlPop = document.getElementById('highlightPopover');
-            hlBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const rect = hlBtn.getBoundingClientRect();
-                hlPop.style.top = `${rect.bottom + 6}px`;
-                hlPop.style.left = `${Math.min(rect.left, window.innerWidth - 270)}px`;
-                hlPop.classList.toggle('hidden');
+                btn.addEventListener('click', () => {
+                    applyCustomBlockStyle(btn.getAttribute('data-block'), btn.getAttribute('data-label'));
+                    closeAllFormatPopovers();
+                });
             });
 
             hlGrid.querySelectorAll('[data-hl-color]').forEach(sw => {
@@ -3266,7 +3449,7 @@
                         }
                         handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
                     }
-                    hlPop.classList.add('hidden');
+                    closeAllFormatPopovers();
                 });
             });
 
@@ -3277,7 +3460,7 @@
                     document.execCommand('backColor', false, 'transparent');
                     handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
                 }
-                hlPop.classList.add('hidden');
+                closeAllFormatPopovers();
             });
 
             document.getElementById('btnInsertChecklist').addEventListener('click', () => {
@@ -3285,6 +3468,7 @@
                 if (!editor) return;
                 document.execCommand('insertHTML', false, `<div class="chrono-check-item"><input type="checkbox"><span>Tugas baru...</span></div><p><br></p>`);
                 handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+                closeAllFormatPopovers();
             });
 
             document.getElementById('btnInsertDivider').addEventListener('click', () => {
@@ -3292,6 +3476,7 @@
                 if (!editor) return;
                 document.execCommand('insertHTML', false, '<hr><p><br></p>');
                 handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+                closeAllFormatPopovers();
             });
 
             document.getElementById('btnInsertNowStamp').addEventListener('click', () => {
@@ -3300,6 +3485,7 @@
                 const stamp = `<span style="background-color: #e0e7ff; color: #3730a3; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">[${formatExactDate(Date.now())}]</span>&nbsp;`;
                 document.execCommand('insertHTML', false, stamp);
                 handleSheetContentChange(editor.getAttribute('data-editor-id'), editor);
+                closeAllFormatPopovers();
             });
 
             // 4. Clickable Link Modal & Floating Link Action Pill Events
@@ -3339,6 +3525,7 @@
             const tableModal = document.getElementById('tableModal');
             document.getElementById('btnOpenTableModal').addEventListener('click', () => {
                 saveCurrentSelection();
+                closeAllFormatPopovers();
                 tableModal.classList.remove('hidden');
             });
             document.getElementById('btnCloseTableModal').addEventListener('click', () => tableModal.classList.add('hidden'));
@@ -3367,6 +3554,7 @@
             const imgModal = document.getElementById('imageModal');
             document.getElementById('btnOpenImageModal').addEventListener('click', () => {
                 saveCurrentSelection();
+                closeAllFormatPopovers();
                 document.getElementById('inputImageUrl').value = '';
                 document.getElementById('inputImageFile').value = '';
                 imgModal.classList.remove('hidden');
@@ -3413,6 +3601,8 @@
             // Mobile Bottom Navigation Bar & Backdrop Bindings
             const backdrop = document.getElementById('mobileDrawerBackdrop');
             backdrop.addEventListener('click', closeMobileSidebars);
+            document.getElementById('btnCloseLeftSidebarMobile').addEventListener('click', closeMobileSidebars);
+            document.getElementById('btnCloseRightSidebarMobile').addEventListener('click', closeMobileSidebars);
 
             document.getElementById('btnMobileTopics').addEventListener('click', () => {
                 const sb = document.getElementById('leftSidebar');
@@ -3530,6 +3720,7 @@
                 }));
             });
             document.getElementById('btnScrollToTop').addEventListener('click', () => {
+                closeMobileSidebars();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
@@ -3679,8 +3870,11 @@
                 pendingDeleteAction = null;
             });
 
+            // Close popovers on outside click
             window.addEventListener('click', (e) => {
-                document.getElementById('highlightPopover').classList.add('hidden');
+                if (!e.target.closest('#popoverParagraph') && !e.target.closest('#popoverFormat') && !e.target.closest('#popoverInsert') && !e.target.closest('.toolbar-dropdown-trigger')) {
+                    closeAllFormatPopovers();
+                }
                 if (!e.target.closest('#linkActionPopover') && !e.target.closest('.chrono-editor a')) {
                     hideLinkActionPopover();
                 }
@@ -3688,6 +3882,7 @@
 
             window.addEventListener('scroll', () => {
                 hideLinkActionPopover();
+                closeAllFormatPopovers();
             }, { passive: true });
 
             if (broadcastChannel) {
